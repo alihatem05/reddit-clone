@@ -1,0 +1,110 @@
+* {
+  margin: 0px;
+  padding: 0px;
+}
+
+#navbar {
+  padding: 5px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #0E1113;
+  border-bottom: 1px solid #3E4142;
+  position: sticky;
+  top: 0;
+  z-index: 1001;
+  font-family: Verdana, Geneva, Tahoma, sans-serif ;
+}
+
+#navbar i {
+    color: white;
+    font-size: 20px;
+    padding: 3px;
+}
+
+#nav-left {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+#searchbar-nav {
+  margin-left: 180px;
+  justify-content: center;
+  display: flex;
+}
+
+#nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+#reddit-logo {
+  margin-top: 5px;
+}
+
+#navbar .logo:hover {
+    background-color: #3E4142;
+    border-radius: 10px;
+}
+
+#searchBar:hover {
+    background-color: #333D42;
+}
+
+#searchBar:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255);
+}
+
+#searchBar {
+  width: 500px;
+  height: 40px;
+  background: #2A3236;
+  border: none;
+  padding: 0 12px 0 40px;
+  border-radius: 999px;
+  transition: box-shadow .15s ease, width .15s ease;
+  font-size: 14px;
+  background-image: './';
+  color: #e6e6e6;
+}
+
+#searchBar::placeholder {
+    color: #80A2Aa;
+}
+
+
+#navbar button {
+  padding: 8px 12px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  background-color: #D93900;
+  color: #e6e6e6;
+  height: 35px;
+}
+
+#navbar button:hover {
+    background-color: #AE2C00;
+}
+
+@media (max-width: 1100px) {
+  #searchBar {
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 950px) {
+  #searchBar {
+    max-width: 250px;
+  }
+}
+
+@media (max-width: 777px) {
+  #searchBar {
+    display: none;
+  }
+}

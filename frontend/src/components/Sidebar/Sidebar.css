@@ -1,0 +1,21 @@
+#sidebar {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    background-color: #0E1113;
+    width: 200px;
+    height: 100vh;
+    gap: 20px;
+    color: white;
+    padding: 20px;
+    align-items: center;
+}
+
+#sidebar .sidebar-button {
+    display: flex;
+    flex-direction: row;
+}
+
+#sidebar i {
+    color: white;
+}
