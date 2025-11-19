@@ -5,10 +5,10 @@
     background-color: #0E1113;
     width: 200px;
     height: 100vh;
-    gap: 20px;
+    gap: 10px;
     color: white;
-    padding: 20px;
-    align-items: center;
+    padding: 25px;
+    font-family: "IBM Plex Sans", -apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 #sidebar .sidebar-button {
@@ -16,6 +16,16 @@
     flex-direction: row;
 }
 
+
 #sidebar i {
     color: white;
+}
+
+#sidebar a {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    border-style: solid;
+    border-color: white;
+    padding: 10px;
 }

@@ -14,7 +14,7 @@
   position: sticky;
   top: 0;
   z-index: 1001;
-  font-family: Verdana, Geneva, Tahoma, sans-serif ;
+  font-family: "IBM Plex Sans", -apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 #navbar i {
