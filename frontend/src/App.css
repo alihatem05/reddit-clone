@@ -1,0 +1,9 @@
+#mainPage {
+    display: flex;
+    flex-direction: row;
+    background-color: #0E1113;;
+}
+
+* {
+    font-family: "IBM Plex Sans", -apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}

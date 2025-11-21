@@ -1,0 +1,52 @@
+.singlePost {
+    display: flex;
+    flex-direction: column;
+    width: 550px;
+    margin: 20px;
+    color: white;
+    padding-bottom: 20px;
+    border-bottom: solid #3E4142 1px;
+}
+
+#upperSection {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 10px;
+}
+
+#postInfo {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    font-size: 14px;
+}
+
+#postInfoInner {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+}
+
+#postInfoInner #subreddit {
+    font-weight: bold;
+    margin-bottom: 0px;
+    padding: 0px;
+}
+
+#postInfoInner #user {
+    margin-top: 0px;
+    padding: 0px;
+}
+
+#subLogo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50px;
+}
+
+#postImg {
+    width: 550px;
+    height: auto;
+    max-height: 550px;
+    border-radius: 10px;
+}
