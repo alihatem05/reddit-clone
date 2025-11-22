@@ -85,6 +85,7 @@
   background-color: #D93900;
   color: #e6e6e6;
   height: 35px;
+  font-weight: bold;
 }
 
 #navbar button:hover {

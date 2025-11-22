@@ -12,7 +12,7 @@ function Post({ post }) {
                 </div>
                 <p>- {post.timeAgo} ago</p>
             </div>
-            <h2>{post.title}</h2>
+            <h3>{post.title}</h3>
         </div>
         <div id="middleSection">
             {post.postImage && <img id="postImg" src={post.postImage} />}

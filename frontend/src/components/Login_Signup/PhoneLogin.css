@@ -1,0 +1,43 @@
+/* Inline country select + phone input */
+.auth-input.inline {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+/* Country select box */
+.auth-input.inline select {
+  border-radius: 5px;
+  padding: 0.5rem 0.4rem;
+  border: 1px solid #ccc;
+  background-color: #f0f0f0;
+  font-weight: bold;
+  font-size: 0.9rem;
+  min-width: 100px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+/* Phone number input */
+.auth-input.inline input {
+  flex: 1; /* takes remaining space */
+  padding: 0.5rem 0.75rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border 0.2s ease;
+}
+
+/* Focus state for input */
+.auth-input.inline input:focus {
+  border-color: #ff4500;
+  box-shadow: 0 0 4px #ff4500;
+}
+
+/* Optional: placeholder style */
+.auth-input.inline input::placeholder {
+  color: #999;
+  font-size: 0.9rem;
+}

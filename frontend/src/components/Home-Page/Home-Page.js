@@ -5,9 +5,11 @@ import { posts } from './../../data/posts'
 function HomePage() {
     return (
         <div id="homePage">
-            {posts.map(post => (
-                <Post key={post.id} post={post} />
-            ))}
+            <div id="postsSection">
+                {posts.map(post => (
+                    <Post key={post.id} post={post} />
+                ))}
+            </div>
         </div>
     );
 }

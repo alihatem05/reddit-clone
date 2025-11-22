@@ -2,10 +2,17 @@
     display: flex;
     flex-direction: column;
     width: 550px;
-    margin: 20px;
     color: white;
-    padding-bottom: 20px;
-    border-bottom: solid #3E4142 1px;
+    padding-bottom: 10px;
+    padding-right: 20px;
+    padding-left: 20px;
+    padding-top: 10px;
+    margin-bottom: 20px;
+    border-radius: 20px;
+}
+
+.singlePost:hover {
+    background-color: #212325;
 }
 
 #upperSection {
@@ -19,6 +26,7 @@
     flex-direction: row;
     gap: 4px;
     font-size: 14px;
+    padding-bottom: 5px;
 }
 
 #postInfoInner {
