@@ -41,13 +41,11 @@
   left: 0.75rem;
 }
 
-/* Title */
 .auth-title {
   font-size: 1.5rem;
   font-weight: 700;
 }
 
-/* Alternative login buttons (Google, Phone, Apple) */
 .auth-alt-buttons {
   display: flex;
   flex-direction: column;
@@ -65,7 +63,6 @@
   color: #fff;
 }
 
-/* Divider (OR) */
 .or-line {
   display: flex;
   align-items: center;
@@ -85,7 +82,6 @@
   border-top: 1px solid #343536;
 }
 
-/* Inputs */
 .auth-input {
   display: flex;
   flex-direction: column;
@@ -106,7 +102,6 @@
   color: #fff;
 }
 
-/* Login button */
 .auth-button {
   width: 100%;
   padding: 0.75rem;

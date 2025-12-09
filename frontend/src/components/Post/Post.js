@@ -7,10 +7,12 @@ function Post({ post }) {
             <div id="postInfo">
                 {post.subredditLogo && <img id="subLogo" src={post.subredditLogo}/>}
                 <div id="postInfoInner">
-                    <p id="subreddit">r/{post.subreddit}</p>
+                    <div id="yarab">
+                        <p id="subreddit">r/{post.subreddit}</p>
+                        <p id="tago">{post.timeAgo} ago</p>
+                    </div>
                     <p id="user">u/{post.username}</p>
                 </div>
-                <p>- {post.timeAgo} ago</p>
             </div>
             <h3>{post.title}</h3>
         </div>

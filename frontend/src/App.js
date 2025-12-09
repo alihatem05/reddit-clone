@@ -17,8 +17,8 @@ function App() {
   return (
     <div>
         <Navbar />
+        <Sidebar />
         <div id="mainPage">
-            <Sidebar />
             <HomePage />
         </div>
 
