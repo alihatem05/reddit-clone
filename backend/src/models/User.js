@@ -6,6 +6,10 @@ const UserSchema = new mongoose.Schema(
     email:    { type: String, required: true, unique: true },
     password: { type: String, default: "" },
     avatar:   { type: String, default: "" },
+
+    joinedCommunities: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Community" }
+    ]
   },
   { timestamps: true }
 );
