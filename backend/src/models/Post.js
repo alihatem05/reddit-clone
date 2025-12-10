@@ -8,6 +8,7 @@ const PostSchema = new mongoose.Schema(
 
     user:       { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     community:  { type: mongoose.Schema.Types.ObjectId, ref: "Community" },
+    comments:   [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" , default: []}],
 
     votes:      { type: Number, default: 0 }
   },
