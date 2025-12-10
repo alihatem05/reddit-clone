@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+
 import { connectDB } from "./config/db.js";
 
 import postRoutes from "./routes/postRoutes.js";
@@ -20,5 +21,5 @@ app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/communities", communityRoutes);
 
-
-app.listen(5000, () => console.log("Server running on port 5000"));
+const PORT = 5005;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
