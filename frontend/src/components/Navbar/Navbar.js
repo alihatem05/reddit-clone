@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import "./Navbar.css";
 import reddit_logo_path from "./../../assets/Reddit-Logo.png";
-import notification_logo_path from "./../../assets/bell.svg";
-import create_post_logo_path from "./../../assets/plus-square.svg";
-import Login from "./../../components/Login_Signup/Login";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -35,10 +32,6 @@ function Navbar() {
           <button onClick={() => setMenuOpen(true)}>Log in</button>
         </div>
       </nav>
-
-      {menuOpen && (
-        <Login closeModal={() => setMenuOpen(false)} />
-      )}
     </>
   );
 }

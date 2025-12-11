@@ -1,17 +1,25 @@
 import "./Home-Page.css"
 import Post from './../Post/Post'
-import { posts } from './../../data/posts'
+import { useState, useEffect} from "react"
 import React from "react";
 
-function HomePage() {
+function HomePage({ posts }) {
+
     return (
         <div id="homePage">
             <div id="postsSection">
-                {posts.map(post => (
-                    <React.Fragment key={post.id}>
-                        <Post post={post} />
-                            <div style={{height: "1px", width: "100%", backgroundColor: " #3E4142", marginTop: "15px", marginBottom: "15px"}}></div>
-                    </React.Fragment>
+                {posts.length === 0 && <p>No posts yet.</p>}
+                {posts.map((p) => (
+                    <>
+                        <Post
+                        key={p._id}
+                        user={p.user}
+                        community={p.community}
+                        post={p}
+                        />
+                        <div style={{ height: "1px", width: "100%", backgroundColor: "#3E4142",
+                            marginTop: "15px", marginBottom: "15px"}}></div>
+                    </>
                 ))}
             </div>
         </div>

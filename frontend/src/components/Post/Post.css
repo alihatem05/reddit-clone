@@ -4,7 +4,7 @@
     flex-direction: column;
     width: 550px;
     color: white;
-    padding-bottom: 10px;
+    padding-bottom: 6px;
     padding-right: 20px;
     padding-left: 20px;
     padding-top: 10px;
@@ -13,6 +13,7 @@
 
 .singlePost:hover {
     background-color: #212325;
+    cursor: pointer;
 }
 
 #upperSection {
@@ -71,4 +72,45 @@
 #yarab {
     display: flex;
     flex-direction: row;
+}
+
+#bottomSection {
+    display: flex;
+    flex-direction: row;
+    font-size: 20px;
+    gap: 20px;
+    padding-top: 5px;
+}
+
+#postVote {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    background-color: #323232;
+    padding: 2px 2px;
+    border-radius: 35px;
+}
+
+#commentPart {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    background-color: #323232;
+    padding: 2px 22px 2px 22px;
+    border-radius: 35px;
+}
+
+#commentPart:hover {
+    background-color: #3d3d3d;
+    cursor: pointer;
+}
+
+.arrow {
+    border-radius: 30px;
+    padding: 0px 4px;
+}
+
+.arrow:hover {
+    background-color: #3d3d3d;
+    cursor: pointer;
 }

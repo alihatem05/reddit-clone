@@ -3,8 +3,8 @@ import Post from "../models/Post.js";
 export const getPosts = async (req, res) => {
   try {
     const posts = await Post.find()
-      .populate("user", "username")
-      .populate("community", "name");
+      .populate("user")
+      .populate("community");
     
     res.json(posts);
   } catch (err) {
@@ -18,5 +18,26 @@ export const createPost = async (req, res) => {
     res.json(newPost);
   } catch (err) {
     res.status(500).json({ error: "Failed to create post" });
+  }
+};
+
+export const updatePost = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updatedPost = await Post.findByIdAndUpdate(
+      id,
+      req.body,
+      { new: true }
+    )
+    .populate("user")
+    .populate("community");
+
+    if (!updatedPost) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    res.json(updatedPost);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update post" });
   }
 };

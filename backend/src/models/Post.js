@@ -9,7 +9,8 @@ const PostSchema = new mongoose.Schema(
     user:       { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     community:  { type: mongoose.Schema.Types.ObjectId, ref: "Community" },
 
-    votes:      { type: Number, default: 0 }
+    votes:      { type: Number, default: 0 },
+    comments: { type: [mongoose.Schema.Types.ObjectId], ref: "Comment", default: [] }
   },
   { timestamps: true }
 );

@@ -1,17 +1,12 @@
 import React, { useState } from "react";
 import "./Sidebar.css";
 
-export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(true);
+export default function Sidebar({communities}) {
   const [showCommunities, setShowCommunities] = useState(false);
 
-  const toggleSidebar = () => setIsOpen(!isOpen);
   const toggleCommunities = () => setShowCommunities(!showCommunities);
 
-  const communities = ["ReactJS", "Vite Lovers", "Frontend Devs", "Coding Memes"];
-
   return (
-    <div className={`sidebar ${isOpen ? "open" : "closed"}`}>
       <div id="sidebar">
         <div id="sideOptions">
           <a>
@@ -45,13 +40,13 @@ export default function Sidebar() {
         </a>
 
         <div className={`communities-dropdown ${showCommunities ? "open" : ""}`}>
-          {communities.map((c, index) => (
-            <a key={index} className="community-item">
-              {c}
-            </a>
-          ))}
+          {communities.length === 0 && <p>No communities yet.</p>}
+                {communities.map((c) => (
+                    <>
+                        <a key={c._id} className="communityItem">r/{c.name}</a>
+                    </>
+                ))}
         </div>
       </div>
-    </div>
   );
 }

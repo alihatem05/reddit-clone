@@ -1,33 +1,48 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/Sidebar/Sidebar";
-import Register from "./components/Login_Signup/Register";
-import PhoneLogin from "./components/Login_Signup/PhoneLogin";
-import Login from "./components/Login_Signup/Login";
-import GoogleLogin from "./components/Login_Signup/GoogleLogin";
-import AppleLogin from "./components/Login_Signup/AppleLogin";
-import EmailLinkLogin from "./components/Login_Signup/EmailLinkLogin";
 import HomePage from "./components/Home-Page/Home-Page"
 import "./App.css"
 
 function App() {
-  const [modal, setModal] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [communities, setCommunities] = useState([]);
 
-  const closeModal = () => setModal(null);
+    useEffect(() => {
+    fetch("http://localhost:5005/api/posts")
+      .then((response) => response.json())
+      .then((data) => {
+        setPosts(data);
+      })
+      .catch((err) => console.log("Error fetching posts:", err));
+    }, []);
+
+    useEffect(() => {
+    fetch("http://localhost:5005/api/users")
+      .then((response) => response.json())
+      .then((data) => {
+        setUsers(data);
+      })
+      .catch((err) => console.log("Error fetching users:", err));
+    }, []);
+
+    useEffect(() => {
+    fetch("http://localhost:5005/api/communities")
+      .then((response) => response.json())
+      .then((data) => {
+        setCommunities(data);
+      })
+      .catch((err) => console.log("Error fetching communities:", err));
+    }, []);
+
   return (
     <div>
         <Navbar />
-        <Sidebar />
+        <Sidebar communities={ communities }/>
         <div id="mainPage">
-            <HomePage />
+            <HomePage posts={ posts }/>
         </div>
-
-        {modal === "login" && <Login closeModal={closeModal} />}
-        {modal === "register" && <Register closeModal={closeModal} />}
-        {modal === "phone-login" && <PhoneLogin closeModal={closeModal} />}
-        {modal === "google-login" && <GoogleLogin closeModal={closeModal} />}
-        {modal === "apple-login" && <AppleLogin closeModal={closeModal} />}
-        {modal === "email-link-login" && <EmailLinkLogin closeModal={closeModal} />}
     </div>
   );
 }
