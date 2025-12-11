@@ -12,6 +12,20 @@ export const getPosts = async (req, res) => {
   }
 };
 
+export const getPost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id)
+      .populate("user", "username")
+      .populate("community", "name");
+
+    if (!post) return res.status(404).json({ error: "Post not found" });
+
+    res.json(post);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch post" });
+  }
+};
+
 export const createPost = async (req, res) => {
   try {
     const newPost = await Post.create(req.body);
