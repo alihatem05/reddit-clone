@@ -35,9 +35,9 @@ function vote(post, up_or_down) {
     .catch(err => console.error(err));
 }
 
-function Post({ post, user, community }) {
+function Post({ post, user, community, onClick }) {
   return (
-    <div className="singlePost">
+    <div className="singlePost" onClick={onClick} style={{ cursor: "pointer" }}>
         <div id="upperSection">
             <div id="postInfo">
                 {community?.logo && <img id="subLogo" src={community.logo}/>}
@@ -56,9 +56,9 @@ function Post({ post, user, community }) {
         </div>
         <div id="bottomSection">
             <div id="postVote">
-                <i id="upvote" class="arrow bi bi-arrow-up" onClick={() => vote(post, "up")}></i>
-                <p id="postVotes">{post.votes}</p>
-                <i id="downvote" class="arrow bi bi-arrow-down" onClick={() => vote(post, "down")}></i>
+              <i id="upvote" className="arrow bi bi-arrow-up" onClick={(e) => { e.stopPropagation(); vote(post, "up") }}></i>
+              <p id="postVotes">{post.votes}</p>
+              <i id="downvote" className="arrow bi bi-arrow-down" onClick={(e) => { e.stopPropagation(); vote(post, "down") }}></i>
             </div>
             <div id="commentPart">
                 <i id="comments" class="bi bi-chat"></i>

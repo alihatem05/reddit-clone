@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/Sidebar/Sidebar";
 import HomePage from "./components/Home-Page/Home-Page"
@@ -37,13 +38,15 @@ function App() {
     }, []);
 
   return (
-    <div>
-        <Navbar />
-        <Sidebar communities={ communities }/>
-        <div id="mainPage">
-            <HomePage posts={ posts }/>
-        </div>
-    </div>
+		<BrowserRouter>
+			<Navbar />
+      <Sidebar communities={ communities }/>
+      <div id="mainPage">
+        <Routes>
+					<Route path="/" element={<HomePage posts={posts} />} />
+        </Routes>
+      </div>
+		</BrowserRouter>
   );
 }
 

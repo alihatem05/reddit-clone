@@ -1,6 +1,5 @@
 import User from "../models/User.js";
 
-// GET all users
 export const getUsers = async (req, res) => {
   try {
     const users = await User.find();
@@ -10,7 +9,6 @@ export const getUsers = async (req, res) => {
   }
 };
 
-// GET single user
 export const getUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -22,7 +20,6 @@ export const getUser = async (req, res) => {
   }
 };
 
-// CREATE a user (register)
 export const createUser = async (req, res) => {
   try {
     const newUser = await User.create(req.body);
@@ -32,7 +29,6 @@ export const createUser = async (req, res) => {
   }
 };
 
-// UPDATE user
 export const updateUser = async (req, res) => {
   try {
     const updated = await User.findByIdAndUpdate(
@@ -49,7 +45,6 @@ export const updateUser = async (req, res) => {
   }
 };
 
-// DELETE user
 export const deleteUser = async (req, res) => {
   try {
     const deleted = await User.findByIdAndDelete(req.params.id);
@@ -62,12 +57,10 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find matching user
     const user = await User.findOne({ email, password });
 
     if (!user) {

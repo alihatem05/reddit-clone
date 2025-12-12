@@ -2,7 +2,6 @@ import Community from "../models/Community.js";
 import Post from "../models/Post.js";
 import User from "../models/User.js";
 
-// GET all communities
 export const getCommunities = async (req, res) => {
   try {
     const communities = await Community.find();
@@ -12,7 +11,6 @@ export const getCommunities = async (req, res) => {
   }
 };
 
-// GET single community
 export const getCommunityById = async (req, res) => {
   try {
     const community = await Community.findById(req.params.id);
@@ -25,7 +23,6 @@ export const getCommunityById = async (req, res) => {
   }
 };
 
-// CREATE a community
 export const createCommunity = async (req, res) => {
   try {
     const newCommunity = await Community.create(req.body);
@@ -35,10 +32,9 @@ export const createCommunity = async (req, res) => {
   }
 };
 
-// JOIN community
 export const joinCommunity = async (req, res) => {
   try {
-    const { userId } = req.body; // TEMP: no auth, so pass in body
+    const { userId } = req.body;
 
     const user = await User.findById(userId);
     const community = await Community.findById(req.params.id);
@@ -46,7 +42,6 @@ export const joinCommunity = async (req, res) => {
     if (!user || !community)
       return res.status(404).json({ error: "User or Community not found" });
 
-    // already joined?
     if (user.joinedCommunities?.includes(community._id))
       return res.json({ message: "Already a member" });
 
@@ -59,7 +54,6 @@ export const joinCommunity = async (req, res) => {
   }
 };
 
-// LEAVE community
 export const leaveCommunity = async (req, res) => {
   try {
     const { userId } = req.body;
@@ -82,7 +76,6 @@ export const leaveCommunity = async (req, res) => {
   }
 };
 
-// GET posts in a community
 export const getCommunityPosts = async (req, res) => {
   try {
     const posts = await Post.find({ community: req.params.id })

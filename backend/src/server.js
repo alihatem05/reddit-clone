@@ -1,24 +1,32 @@
 import express from "express";
 import cors from "cors";
-import { connectDB } from "./config/db.js";
 import postRoutes from "./routes/postRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import communityRoutes from "./routes/communityRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 import dotenv from "dotenv";
+import mongoose from "mongoose";
 
 dotenv.config();
 
 const app = express();
-connectDB();
-
 
 app.use(cors());
 app.use(express.json());
+
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/communities", communityRoutes);
 
-const PORT = 5005;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const PORT = process.env.PORT || 5005;
+
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    app.listen(PORT, () => 
+      console.log(`Server running on port ${PORT} and DB connected.`)
+    );
+  })
+  .catch((error) => {
+    console.log(error);
+  });
