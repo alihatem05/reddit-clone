@@ -1,5 +1,6 @@
 import "./Post-Page.css";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 
 function timeSince(dateString) {
   const now = new Date();
@@ -21,8 +22,9 @@ function timeSince(dateString) {
   return "few seconds ago";
 }
 
-function vote(post, up_or_down) {
-  const action = up_or_down === "up" ? post.votes + 1 : up_or_down === "down" ? post.votes - 1:  post.votes;
+function vote(post, up_or_down, setPost) {
+  const action =
+    up_or_down === "up" ? post.votes + 1 : up_or_down === "down" ? post.votes - 1 : post.votes;
 
   fetch(`http://localhost:5005/api/posts/${post._id}`, {
     method: "PUT",
@@ -30,25 +32,46 @@ function vote(post, up_or_down) {
     body: JSON.stringify({ votes: action }),
   })
     .then((res) => res.json())
+    .then((updatedPost) => setPost(updatedPost))
     .catch((err) => console.error(err));
 }
 
-function PostPage({ post, user, community }) {
+function PostPage({ posts = [], users = [], communities = [] }) {
+  const { id } = useParams();
+  const [post, setPost] = useState(null);
+
+  useEffect(() => {
+    const foundPost = posts.find((p) => p._id === id);
+    if (foundPost) {
+      setPost(foundPost);
+    } else {
+      fetch(`http://localhost:5005/api/posts/${id}`)
+        .then((res) => res.json())
+        .then((data) => setPost(data))
+        .catch((err) => console.error(err));
+    }
+  }, [id, posts]);
+
+  if (!post) return <p>Loading...</p>;
+
+  const user = users.find((u) => u._id === post.user) || 
+               (typeof post.user === "object" ? post.user : null);
+  const community = communities.find((c) => c._id === post.community) || 
+                    (typeof post.community === "object" ? post.community : null);
+
   return (
     <div id="postDetailedPage">
       <div id="postDetailed">
         <div id="upperSectionDetailed">
           <div id="postInfoDetailed">
-            {community?.logo && (
-              <img id="subLogoDetailed" src={community.logo} />
-            )}
+            {community?.logo && <img id="subLogoDetailed" src={community.logo} />}
             <div id="postInfoInnerDetailed">
               <div id="yarabD">
                 <p id="subredditD">r/{community?.name || "Unknown"}</p>
                 <p id="tagoD">{timeSince(post.createdAt)}</p>
               </div>
               <div id="accountInfoDet">
-                <img id="userPfp" src={`/pfps/${user?.avatar}`} />
+                <img id="userPfp" src={`/pfps/${user?.avatar || "default.png"}`} />
                 <p id="userD">u/{user?.username || "Anonymous"}</p>
               </div>
             </div>
@@ -59,7 +82,7 @@ function PostPage({ post, user, community }) {
 
         <div id="middleSectionDetailed">
           {post.image && <img id="postImgD" src={post.image} />}
-          <p>{post.description}</p>
+          <p>{post.description || "No Description"}</p>
         </div>
 
         <div id="bottomSectionDetailed">
@@ -67,13 +90,13 @@ function PostPage({ post, user, community }) {
             <i
               id="upvoteD"
               className="arrow bi bi-arrow-up"
-              onClick={() => vote(post, "up")}
+              onClick={() => vote(post, "up", setPost)}
             ></i>
             <p id="postVotesD">{post.votes}</p>
             <i
               id="downvoteD"
               className="arrow bi bi-arrow-down"
-              onClick={() => vote(post, "down")}
+              onClick={() => vote(post, "down", setPost)}
             ></i>
           </div>
           <div id="commentPartD">
@@ -93,9 +116,7 @@ function PostPage({ post, user, community }) {
         }}
       ></div>
 
-      <div id="commentsSection">
-        
-      </div>
+      <div id="commentsSection"></div>
     </div>
   );
 }

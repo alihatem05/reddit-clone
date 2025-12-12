@@ -1,9 +1,20 @@
 import "./Home-Page.css"
 import Post from './../Post/Post'
 import { useState, useEffect} from "react"
+import { useNavigate } from "react-router-dom";
 import React from "react";
 
-function HomePage({ posts }) {
+function HomePage() {
+    const navigate = useNavigate();
+
+    const [posts, setPosts] = useState([]);
+
+    useEffect(() => {
+        fetch("http://localhost:5005/api/posts")
+        .then((res) => res.json())
+        .then(setPosts)
+        .catch(console.log);
+    }, []);
 
     return (
         <div id="homePage">
@@ -16,6 +27,7 @@ function HomePage({ posts }) {
                         user={p.user}
                         community={p.community}
                         post={p}
+                        onClick={() => navigate(`/post/${p._id}`)}
                         />
                         <div style={{ height: "1px", width: "100%", backgroundColor: "#3E4142",
                             marginTop: "15px", marginBottom: "15px"}}></div>

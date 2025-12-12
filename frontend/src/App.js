@@ -1,52 +1,48 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/Sidebar/Sidebar";
-import HomePage from "./components/Home-Page/Home-Page"
-import "./App.css"
+import HomePage from "./components/Home-Page/Home-Page";
+import PostPage from "./components/Post-Page/Post-Page";
+import "./App.css";
 
 function App() {
   const [posts, setPosts] = useState([]);
-  const [users, setUsers] = useState([]);
   const [communities, setCommunities] = useState([]);
+  const [users, setUsers] = useState([]);
 
-    useEffect(() => {
+  useEffect(() => {
     fetch("http://localhost:5005/api/posts")
-      .then((response) => response.json())
-      .then((data) => {
-        setPosts(data);
-      })
-      .catch((err) => console.log("Error fetching posts:", err));
-    }, []);
+      .then((res) => res.json())
+      .then((data) => setPosts(data))
+      .catch((err) => console.error("Error fetching posts:", err));
+  }, []);
 
-    useEffect(() => {
-    fetch("http://localhost:5005/api/users")
-      .then((response) => response.json())
-      .then((data) => {
-        setUsers(data);
-      })
-      .catch((err) => console.log("Error fetching users:", err));
-    }, []);
-
-    useEffect(() => {
+  useEffect(() => {
     fetch("http://localhost:5005/api/communities")
-      .then((response) => response.json())
-      .then((data) => {
-        setCommunities(data);
-      })
-      .catch((err) => console.log("Error fetching communities:", err));
-    }, []);
+      .then((res) => res.json())
+      .then((data) => setCommunities(data))
+      .catch((err) => console.error("Error fetching communities:", err));
+  }, []);
+
+  useEffect(() => {
+    fetch("http://localhost:5005/api/users")
+      .then((res) => res.json())
+      .then((data) => setUsers(data))
+      .catch((err) => console.error("Error fetching users:", err));
+  }, []);
 
   return (
-		<BrowserRouter>
-			<Navbar />
-      <Sidebar communities={ communities }/>
+    <BrowserRouter>
+      <Navbar />
+      <Sidebar />
       <div id="mainPage">
         <Routes>
-					<Route path="/" element={<HomePage posts={posts} />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/post/:id" element={<PostPage posts={posts} users={users} communities={communities} />} />
         </Routes>
       </div>
-		</BrowserRouter>
+    </BrowserRouter>
   );
 }
 

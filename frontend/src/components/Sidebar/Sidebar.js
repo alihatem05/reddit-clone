@@ -1,10 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Sidebar.css";
 
-export default function Sidebar({communities}) {
+export default function Sidebar() {
   const [showCommunities, setShowCommunities] = useState(false);
+  const [communities, setCommunities] = useState([]);
 
   const toggleCommunities = () => setShowCommunities(!showCommunities);
+
+  useEffect(() => {
+    fetch("http://localhost:5005/api/communities")
+      .then((response) => response.json())
+      .then((data) => {
+        setCommunities(data);
+      })
+      .catch((err) => console.log("Error fetching communities:", err));
+    }, []);
 
   return (
       <div id="sidebar">
