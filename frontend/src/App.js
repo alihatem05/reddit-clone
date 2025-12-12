@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
+import { Navigate, BrowserRouter, Routes, Route, useParams } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/Sidebar/Sidebar";
 import HomePage from "./components/Home-Page/Home-Page";
 import PostPage from "./components/Post-Page/Post-Page";
+import Login from "./components/Login/Login";
+import Register from './components/Register/Register'
 import "./App.css";
 
 function App() {
   const [posts, setPosts] = useState([]);
   const [communities, setCommunities] = useState([]);
   const [users, setUsers] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     fetch("http://localhost:5005/api/posts")
@@ -34,14 +37,17 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Navbar />
-      <Sidebar />
-      <div id="mainPage">
+    {isLoggedIn && (
+        <>
+          <Navbar />
+          <Sidebar />
+        </>
+      )}
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/post/:id" element={<PostPage posts={posts} users={users} communities={communities} />} />
+            <Route path="/" element={isLoggedIn ? <HomePage /> : <Navigate to="/login" />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
         </Routes>
-      </div>
     </BrowserRouter>
   );
 }

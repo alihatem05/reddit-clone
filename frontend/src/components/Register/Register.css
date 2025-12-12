@@ -1,0 +1,82 @@
+.register-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #0E1113;
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+.register-card {
+  background: #1a1a1b;
+  padding: 1.2rem;
+  border-radius: 10px;
+  min-width: 320px;
+  max-width: 400px;
+  position: relative;
+  color: #fff;
+}
+
+.register-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.register-input {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.register-input span {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.register-input input {
+  padding: 0.7rem;
+  border-radius: 5px;
+  border: 1px solid #343536;
+  background: #272729;
+  color: #fff;
+}
+
+.register-button {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 20px;
+  background-color: #D93900;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  cursor: pointer;
+}
+
+.register-button:hover {
+    background-color: #AE2C00;
+}
+
+.login-text {
+  cursor: pointer;
+  margin-top: 10px;
+  color: #59a6ff;
+  text-align: center;
+}
+
+.login-text:hover {
+    text-decoration: underline;
+}
+
+#redditRegisterLogo {
+    width: 200px;
+}
+
+#registerHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
