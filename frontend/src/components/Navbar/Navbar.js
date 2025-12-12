@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import "./Navbar.css";
 import reddit_logo_path from "./../../assets/Reddit-Logo.png";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "./../../hooks/useAuthContext";
 
 function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [communities, setCommunities] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
+  const { user }  = useAuthContext()
 
   const navigate = useNavigate();
 
@@ -73,7 +74,8 @@ function Navbar() {
             <i className="bi bi-bell" />
           </a>
 
-          <button onClick={() => setMenuOpen(true)}>Log in</button>
+
+          <img id="userProfilePfp" src={`/pfps/${user?.avatar || 'gray.png'}`} alt="User avatar" />
         </div>
       </nav>
     </>

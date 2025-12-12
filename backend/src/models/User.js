@@ -6,8 +6,8 @@ const UserSchema = new mongoose.Schema(
   {
     username: { type: String, required: true, unique: true },
     email:    { type: String, required: true, unique: true },
-    password: { type: String, default: "" },
-    avatar:   { type: String, default: "" },
+    password: { type: String, required:true, default: "" },
+    avatar:   { type: String, default: "gray.png" },
     karma:    { type: Number, default: 0 },
 
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],

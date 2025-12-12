@@ -64,7 +64,7 @@ function PostPage({ posts = [], users = [], communities = [] }) {
                 <p id="tagoD">{timeSince(post.createdAt)}</p>
               </div>
               <div id="accountInfoDet">
-                <img id="userPfp" src={`/pfps/${user?.avatar || "default.png"}`} />
+                <img id="userPfp" src={`/pfps/${user?.avatar || "gray.png"}`} />
                 <p id="userD">u/{user?.username || "Anonymous"}</p>
               </div>
             </div>

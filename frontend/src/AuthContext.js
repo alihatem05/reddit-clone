@@ -14,8 +14,10 @@ export const authReducer = (state, action) => {
 }
 
 export const AuthContextProvider = ({children}) => {
+    const stored = JSON.parse(localStorage.getItem('user')) || null
+    const initialUser = stored && stored.user ? stored.user : stored
     const [state, dispatch] = useReducer(authReducer , {
-        user: null
+        user: initialUser
     })
     console.log('AuthContext state: ', state)
 

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useLogin } from "./../../hooks/useLogin"
 import React, { useState } from "react";
 import "./Login.css";
 
@@ -6,13 +7,14 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate()
+  const { login, error } = useLogin()
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (email && password) {
-      alert(`Logged in with email: ${email}`);
-    } else {
-      alert("Please enter email and password");
+    
+    const result = await login(email, password);
+    if (result) {
+      navigate('/');
     }
   };
 
