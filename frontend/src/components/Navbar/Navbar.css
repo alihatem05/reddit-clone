@@ -18,9 +18,9 @@
 }
 
 #navbar i {
-    color: white;
-    font-size: 20px;
-    padding: 3px;
+  color: white;
+  font-size: 20px;
+  padding: 3px;
 }
 
 #nav-left {
@@ -33,6 +33,7 @@
   margin-left: 180px;
   justify-content: center;
   display: flex;
+  position: relative; /* needed for dropdown */
 }
 
 #nav-right {
@@ -46,12 +47,12 @@
 }
 
 #navbar .logo:hover {
-    background-color: #3E4142;
-    border-radius: 10px;
+  background-color: #3E4142;
+  border-radius: 10px;
 }
 
 #searchBar:hover {
-    background-color: #333D42;
+  background-color: #333D42;
 }
 
 #searchBar:focus {
@@ -68,15 +69,46 @@
   border-radius: 999px;
   transition: box-shadow .15s ease, width .15s ease;
   font-size: 14px;
-  background-image: './';
   color: #e6e6e6;
 }
 
 #searchBar::placeholder {
-    color: #80A2Aa;
+  color: #80A2Aa;
 }
 
+/* Search Dropdown */
+.search-dropdown {
+  position: absolute;
+  top: 45px; /* just below the input */
+  left: 0;
+  width: 100%;
+  background-color: #1C1F23;
+  border: 1px solid #3E4142;
+  border-radius: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1002;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
 
+.search-dropdown p {
+  padding: 8px 12px;
+  color: #a0a0a0;
+  font-size: 14px;
+}
+
+.dropdown-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  color: #e6e6e6;
+  font-size: 14px;
+}
+
+.dropdown-item:hover {
+  background-color: #3E4142;
+}
+
+/* Buttons */
 #navbar button {
   padding: 8px 12px;
   border-radius: 25px;
@@ -89,7 +121,7 @@
 }
 
 #navbar button:hover {
-    background-color: #AE2C00;
+  background-color: #AE2C00;
 }
 
 @media (max-width: 1100px) {

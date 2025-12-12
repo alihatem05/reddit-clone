@@ -44,20 +44,13 @@ function PostPage({ posts = [], users = [], communities = [] }) {
     const foundPost = posts.find((p) => p._id === id);
     if (foundPost) {
       setPost(foundPost);
-    } else {
-      fetch(`http://localhost:5005/api/posts/${id}`)
-        .then((res) => res.json())
-        .then((data) => setPost(data))
-        .catch((err) => console.error(err));
     }
   }, [id, posts]);
 
   if (!post) return <p>Loading...</p>;
 
-  const user = users.find((u) => u._id === post.user) || 
-               (typeof post.user === "object" ? post.user : null);
-  const community = communities.find((c) => c._id === post.community) || 
-                    (typeof post.community === "object" ? post.community : null);
+  const user = (typeof post.user === "object" ? post.user : null);
+  const community = (typeof post.community === "object" ? post.community : null);
 
   return (
     <div id="postDetailedPage">
