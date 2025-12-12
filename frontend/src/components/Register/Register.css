@@ -80,3 +80,13 @@
     flex-direction: column;
     align-items: center;
 }
+
+.error {
+    text-align: center;
+    margin-bottom: 10px;
+    padding: 2px;
+    border: rgb(91, 38, 38) solid;
+    border-radius: 3px;
+    border-radius: 2px;
+    background-color: rgb(26, 20, 20);
+}

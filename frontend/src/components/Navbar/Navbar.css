@@ -33,7 +33,7 @@
   margin-left: 180px;
   justify-content: center;
   display: flex;
-  position: relative; /* needed for dropdown */
+  position: relative;
 }
 
 #nav-right {
@@ -76,10 +76,9 @@
   color: #80A2Aa;
 }
 
-/* Search Dropdown */
 .search-dropdown {
   position: absolute;
-  top: 45px; /* just below the input */
+  top: 45px;
   left: 0;
   width: 100%;
   background-color: #1C1F23;
@@ -108,7 +107,6 @@
   background-color: #3E4142;
 }
 
-/* Buttons */
 #navbar button {
   padding: 8px 12px;
   border-radius: 25px;
@@ -125,8 +123,46 @@
 }
 
 #userProfilePfp {
-    width: 30px;
+    width: 32px;
     border-radius: 30px;
+    margin-right: 5px;
+}
+
+#userProfilePfp:hover {
+    cursor: pointer;
+}
+
+#dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  background: #0E1113;
+  padding: 10px 0;
+  border-radius: 2px;
+  border: #3E4142 solid;
+  color: white;
+  min-width: 140px;
+  z-index: 50;
+}
+
+#pSection {
+  position: relative;
+  display: inline-block;
+}
+
+#pSection:hover #dropdown {
+  display: block;
+}
+
+#dropdown p {
+  padding: 4px 10px;
+  margin: 0;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#dropdown p:hover {
+  background-color: #181C1F;;
 }
 
 @media (max-width: 1100px) {

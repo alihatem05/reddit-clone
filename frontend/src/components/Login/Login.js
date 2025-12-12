@@ -26,6 +26,8 @@ function Login() {
             <h3 className="auth-title text-center mb-3">Log In</h3>
         </div>
 
+        {error && <div className="error">{error}</div>}
+
         <form onSubmit={handleLogin}>
           <div className="auth-input">
             <span>Email or Username</span>

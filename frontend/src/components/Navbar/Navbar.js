@@ -3,12 +3,14 @@ import "./Navbar.css";
 import reddit_logo_path from "./../../assets/Reddit-Logo.png";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "./../../hooks/useAuthContext";
+import { useLogout } from "./../../hooks/useLogout"
 
 function Navbar() {
   const [communities, setCommunities] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const { user }  = useAuthContext()
+  const { logout } = useLogout()
 
   const navigate = useNavigate();
 
@@ -27,6 +29,10 @@ function Navbar() {
     navigate(`/community/${id}`);
     setSearchTerm("");
     setShowDropdown(false);
+  };
+
+  const handleLogout = (e) => {
+    logout()
   };
 
   return (
@@ -74,8 +80,13 @@ function Navbar() {
             <i className="bi bi-bell" />
           </a>
 
-
-          <img id="userProfilePfp" src={`/pfps/${user?.avatar || 'gray.png'}`} alt="User avatar" />
+          <div id="pSection">
+            <img id="userProfilePfp" src={`/pfps/${user?.avatar}`} alt="User avatar" />
+            <div id="dropdown">
+              <p>Account</p>
+              <p onClick={() => handleLogout()}>Logout</p>
+            </div>
+          </div>
         </div>
       </nav>
     </>
