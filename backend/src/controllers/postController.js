@@ -1,5 +1,6 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
+import Comment from "../models/Comment.js";
 
 export const getPosts = async (req, res) => {
   try {
@@ -18,7 +19,13 @@ export const getPost = async (req, res) => {
     const post = await Post.findById(req.params.id)
       .populate("user")
       .populate("community")
-      .populate({ path: 'comments', populate: { path: 'user' } });
+      .populate({
+        path: 'comments',
+        populate: [
+          { path: 'user' },
+          { path: 'replies', populate: { path: 'user' } },
+        ],
+      });
 
     if (!post) return res.status(404).json({ error: "Post not found" });
 
@@ -60,5 +67,88 @@ export const updatePost = async (req, res) => {
     res.json(updatedPost);
   } catch (err) {
     res.status(500).json({ error: "Failed to update post" });
+  }
+};
+
+export const votePost = async (req, res) => {
+  try {
+    const { delta, userId } = req.body;
+    if (!userId) return res.status(400).json({ error: 'userId required' });
+    const id = req.params.id;
+    const post = await Post.findById(id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+
+    const hasUp = post.upvoters.some(u => u.toString() === userId);
+    const hasDown = post.downvoters.some(u => u.toString() === userId);
+
+    if (delta === 0) {
+      // remove existing vote
+      if (hasUp) {
+        post.upvoters = post.upvoters.filter(u => u.toString() !== userId);
+        post.votes -= 1;
+      } else if (hasDown) {
+        post.downvoters = post.downvoters.filter(u => u.toString() !== userId);
+        post.votes += 1;
+      } else {
+        return res.status(400).json({ error: 'No existing vote to remove' });
+      }
+    } else if (delta === 1) {
+      if (hasUp) {
+        post.upvoters = post.upvoters.filter(u => u.toString() !== userId);
+        post.votes -= 1;
+      } else {
+        if (hasDown) {
+          post.downvoters = post.downvoters.filter(u => u.toString() !== userId);
+          post.votes += 1; // remove downvote then add upvote
+        }
+        post.upvoters.push(userId);
+        post.votes += 1;
+      }
+    } else if (delta === -1) {
+      if (hasDown) {
+        post.downvoters = post.downvoters.filter(u => u.toString() !== userId);
+        post.votes += 1;
+      } else {
+        if (hasUp) {
+          post.upvoters = post.upvoters.filter(u => u.toString() !== userId);
+          post.votes -= 1; // remove upvote (-1) then add downvote (-1)
+        }
+        post.downvoters.push(userId);
+        post.votes -= 1;
+      }
+    }
+    await post.save();
+    const populated = await Post.findById(post._id)
+      .populate('user')
+      .populate('community')
+      .populate({
+        path: 'comments',
+        populate: [
+          { path: 'user' },
+          { path: 'replies', populate: { path: 'user' } },
+        ],
+      });
+    res.json(populated);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update post vote' });
+  }
+};
+
+export const deletePost = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { userId } = req.body;
+    if (!userId) return res.status(400).json({ error: 'userId required' });
+    const post = await Post.findById(id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    if (post.user.toString() !== userId) return res.status(403).json({ error: 'Not authorized' });
+
+    // remove comments linked to this post
+    await Post.findByIdAndDelete(id);
+    // delete all comments associated with this post
+    await Comment.deleteMany({ post: id });
+    res.json({ message: 'Post deleted' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete post' });
   }
 };

@@ -30,9 +30,179 @@ function PostPage({ }) {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { user: currentUser } = useAuthContext();
-  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  
+  const appendReplyToComment = (commentsArray, parentId, newComment) => {
+    return commentsArray.map(c => {
+      if (String(c._id) === String(parentId)) {
+        const replies = c.replies ? [...c.replies, newComment] : [newComment];
+        return { ...c, replies };
+      }
+      if (c.replies && c.replies.length > 0) {
+        return { ...c, replies: appendReplyToComment(c.replies, parentId, newComment) };
+      }
+      return c;
+    });
+  };
+
+  const removeCommentFromTree = (commentsArray, idToRemove) => {
+    return commentsArray.filter(c => String(c._id) !== String(idToRemove)).map(c => {
+      if (c.replies && c.replies.length) {
+        return { ...c, replies: removeCommentFromTree(c.replies, idToRemove) };
+      }
+      return c;
+    });
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    if (!currentUser?._id) return;
+    try {
+      const res = await fetch(`/api/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUser._id }),
+      });
+      if (!res.ok) return;
+      setPost(prev => ({ ...prev, comments: removeCommentFromTree(prev.comments || [], commentId) }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const userInArray = (arr) => {
+    if (!currentUser || !arr) return false;
+    return arr.some(u => String(typeof u === 'object' ? u._id : u) === String(currentUser._id));
+  };
+
+  const handlePostComment = async ({ text, parentId = null }) => {
+    if (!text || !text.trim()) return null;
+    setIsSubmittingComment(true);
+    try {
+      const response = await fetch(`/api/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, user: currentUser?._id || null, post: post._id, parent: parentId }),
+      });
+      const json = await response.json();
+      if (!response.ok) {
+        console.error('Failed to submit comment', json);
+        return null;
+      }
+      if (parentId) {
+        setPost(prev => ({ ...prev, comments: appendReplyToComment(prev.comments || [], parentId, json) }));
+      } else {
+        setPost(prev => ({ ...prev, comments: [...(prev.comments || []), json] }));
+      }
+      return json;
+    } catch (err) {
+      console.error(err);
+      return null;
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
+  const handleVoteComment = async (commentId, delta) => {
+    try {
+      const res = await fetch(`/api/comments/${commentId}/vote`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ delta, userId: currentUser?._id || null }),
+      });
+      const updated = await res.json();
+      if (!res.ok) return;
+      const replaceComment = (commentsArray) => {
+        return commentsArray.map(c => {
+          if (String(c._id) === String(commentId)) {
+            // return the updated object; ensure replies field is present
+            return { ...c, ...updated };
+          }
+          if (c.replies && c.replies.length) {
+            return { ...c, replies: replaceComment(c.replies) };
+          }
+          return c;
+        });
+      };
+      setPost(prev => ({ ...prev, comments: replaceComment(prev.comments || []) }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleVotePost = async (delta) => {
+    const hasUp = userInArray(post.upvoters);
+    const hasDown = userInArray(post.downvoters);
+    let outDelta = delta;
+    if (delta === 1 && hasUp) outDelta = 0;
+    if (delta === -1 && hasDown) outDelta = 0;
+    // optimistic update
+    setPost(prev => {
+      const p = { ...prev };
+      if (outDelta === 0) {
+        if (hasUp) {
+          p.votes -= 1;
+          p.upvoters = p.upvoters.filter(u => String(typeof u === 'object' ? u._id : u) !== String(currentUser._id));
+        } else if (hasDown) {
+          p.votes += 1;
+          p.downvoters = p.downvoters.filter(u => String(typeof u === 'object' ? u._id : u) !== String(currentUser._id));
+        }
+      } else if (outDelta === 1) {
+        if (hasDown) {
+          p.votes += 2; // switch
+          p.downvoters = p.downvoters.filter(u => String(typeof u === 'object' ? u._id : u) !== String(currentUser._id));
+        } else {
+          p.votes += 1;
+        }
+        p.upvoters = [...(p.upvoters || []), currentUser._id];
+      } else if (outDelta === -1) {
+        if (hasUp) {
+          p.votes -= 2; // switch
+          p.upvoters = p.upvoters.filter(u => String(typeof u === 'object' ? u._id : u) !== String(currentUser._id));
+        } else {
+          p.votes -= 1;
+        }
+        p.downvoters = [...(p.downvoters || []), currentUser._id];
+      }
+      return p;
+    });
+    try {
+      const res = await fetch(`/api/posts/${post._id}/vote`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ delta: outDelta, userId: currentUser?._id || null }),
+      });
+      const updated = await res.json();
+      if (!res.ok) return;
+      setPost(updated);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeletePost = async () => {
+    if (!currentUser?._id) return;
+    try {
+      const res = await fetch(`/api/posts/${post._id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUser._id }),
+      });
+      if (!res.ok) {
+        console.error('Failed to delete post');
+        return;
+      }
+      navigate(-1);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCommenting = async () => {
+    if (!commentText.trim()) return;
+      await handlePostComment({ text: commentText, parentId: null });
+      setCommentText('');
+  }
 
   useEffect(() => {
     if (!id) return;
@@ -80,116 +250,53 @@ function PostPage({ }) {
                 <p id="userD">u/{user?.username || "Anonymous"}</p>
               </div>
             </div>
+            {currentUser?._id === user?._id && (
+              <i id="trashcan" className="bi bi-trash3" onClick={() => handleDeletePost()} ></i>
+            )}
           </div>
-
-          <h2>{post.title}</h2>
+            <h2>{post.title}</h2>
         </div>
 
-        <div id="middleSectionDetailed">
-          {post.image && <img id="postImgD" src={post.image} />}
-          {post.description ? (
-            <p>{post.description}</p>
-          ) : (
-            <p className="no-description">No Description</p>
-          )}
-        </div>
-
-        <div id="bottomSectionDetailed">
-          <div id="postVoteD">
-            <i
-              id="upvoteD"
-              className="arrow bi bi-arrow-up"
-            ></i>
-            <p id="postVotesD">{post.votes}</p>
-            <i
-              id="downvoteD"
-              className="arrow bi bi-arrow-down"
-            ></i>
+          <div id="middleSectionDetailed">
+            {post.image && <img id="postImgD" src={post.image} />}
+            <p>{post.description || <span className="no-description">No Description</span>}</p>
           </div>
-          <div id="commentPartD">
-            <i id="commentsD" className="bi bi-chat"></i>
-            <p>{post.comments.length}</p>
-          </div>
-        </div>
-      </div>
 
-      <div
-        style={{
-          height: "1px",
-          width: "90%",
-          backgroundColor: "#3E4142",
-          marginTop: "15px",
-          marginBottom: "15px",
-        }}
-      ></div>
+          <div id="bottomSectionDetailed">
+            <div id="postVoteD">
+              <i id="upvoteD" className={`arrow bi bi-arrow-up ${userInArray(post.upvoters) ? 'active' : ''}`} onClick={() => { if (currentUser) handleVotePost(1); }} style={{ color: userInArray(post.upvoters) ? '#f97316' : undefined }}></i>
+              <p id="postVotesD">{post.votes}</p>
+              <i id="downvoteD" className={`arrow bi bi-arrow-down ${userInArray(post.downvoters) ? 'active' : ''}`} onClick={() => { if (currentUser) handleVotePost(-1); }} style={{ color: userInArray(post.downvoters) ? '#0ea5e9' : undefined }}></i>
+            </div>
+            <div id="commentPartD">
+              <i id="commentsD" className="bi bi-chat"></i>
+              <p>{post.comments.length}</p>
+            </div>
+          </div>
+
+      <div style={{height: "1px", width: "100%", backgroundColor: "#3E4142", marginTop: "15px", marginBottom: "15px"}}></div>
 
       <div id="commentsSection">
-        <div style={{ display: "flex", justifyContent: "flex-end", width: "100%", marginBottom: '12px' }}>
-          <button
-            className="create-post-btn"
-            onClick={() => setIsCommentModalOpen(true)}
-          >
-            Add a Comment
-          </button>
-        </div>
-        {post.comments && post.comments.length > 0 ? (
-          post.comments.map((c) => (
-            <Comment key={c._id} comment={c} />
-          ))
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-            <p style={{ color: '#8f9496', marginTop: '10px' }}>No comments yet.</p>
-          </div>
-        )}
-        {isCommentModalOpen && (
-          <div className="modal-overlay">
-            <div className="comment-modal">
-              <h3 style={{ margin: 0 }}>Add a comment</h3>
-              <textarea
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                rows={4}
-                style={{ width: '100%', marginTop: 10, padding: 8, background: '#0f1314', color: '#fff', border: '1px solid #3e4142' }}
-                placeholder="Add your comment..."
-              />
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12, gap: 8 }}>
-                <button className="tab-arrow" onClick={() => { setIsCommentModalOpen(false); setCommentText(""); }}>Cancel</button>
-                <button
-                  className="create-post-btn"
-                  onClick={async () => {
-                    if (!commentText.trim()) return;
-                    setIsSubmittingComment(true);
-                    try {
-                      const response = await fetch(`/api/comments`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ text: commentText, user: currentUser?._id || null, post: post._id }),
-                      });
-                      const json = await response.json();
-                      if (!response.ok) {
-                        console.error('Failed to submit comment', json);
-                        setIsSubmittingComment(false);
-                        return;
-                      }
-                      // add comment to the list
-                      setPost((prev) => ({ ...prev, comments: [...(prev.comments || []), json] }));
-                      setIsCommentModalOpen(false);
-                      setCommentText("");
-                    } catch (err) {
-                      console.error(err);
-                    } finally {
-                      setIsSubmittingComment(false);
-                    }
-                  }}
-                >
-                  {isSubmittingComment ? 'Posting...' : 'Post Comment'}
-                </button>
-              </div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', width: '100%', marginBottom: 12 }}>
+          <img src={`/pfps/${currentUser?.avatar || 'gray.png'}`} alt="avatar" style={{ width: 34, height: 34, borderRadius: 20 }} />
+          <div style={{ flex: 1 }}>
+            <textarea id="commentinput" value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Write a comment" rows={2}/>
+            <div id="postcommentsector">
+              <button id="postthecomment" onClick={() => handleCommenting()}>Post Comment</button>
             </div>
+          </div>
+        </div>
+
+        {post.comments && post.comments.length > 0 ? ( post.comments.map((c) => (
+          <Comment key={c._id} comment={c} onReply={handlePostComment} onVote={handleVoteComment} onDelete={handleDeleteComment} />
+        ))) : (
+          <div id="nocomments">
+            <p id="pp">No comments yet.</p>
           </div>
         )}
       </div>
     </div>
+  </div>
   );
 }
 

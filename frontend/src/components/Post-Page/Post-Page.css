@@ -67,6 +67,10 @@
     font-size: 13px;
 }
 
+#userD:hover {
+    text-decoration: underline;
+}
+
 #subLogoDetailed {
     width: 50px;
     height: 50px;
@@ -133,13 +137,11 @@
     font-size: 16px;
 }
 
-/* No description text when there is no description */
 .no-description {
         text-align: center;
         color: #8f9496;
 }
 
-/* modal styles for comments */
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -157,6 +159,14 @@
     border-radius: 8px;
     padding: 16px;
     border: 1px solid #3E4142;
+}
+.create-post-btn {
+    width: 110px;
+    height: 30px;
+    background-color: #0E1113;
+    border: solid #3E4142;
+    color: white;
+    border-radius: 20px;
 }
 
 #userPfp {
@@ -182,4 +192,68 @@
 
 #commentsSection {
     min-height: 300px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: #0E1113;
+}
+
+#trashcan {
+    margin-left: 320px;
+    font-size: 18px;
+    padding: 3px;
+    border: solid #3E4142;
+    border-radius: 40px;
+}
+
+#commentinput {
+    width: 96%;
+    padding: 8px;
+    border: 1px solid #3E4142;
+    border-radius: 6px;
+    background: #0E1113;
+    color: #fff;
+}
+
+#nocomments {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    gap: 12px;
+    width: 100%;
+}
+
+#pp {
+    color: #8f9496; 
+    margin-top: 10px;
+    text-align: center;
+}
+
+#trashcan:hover {
+    background-color: #281b1b;
+    cursor: pointer;
+}
+
+#postcommentsector {
+    display: flex; 
+    justify-content: flex-start;
+    margin-top: 8px;
+}
+
+#postthecomment {
+    background-color: #0f1314;
+    color: white;
+    width: 120px;
+    border: solid #3E4142;
+    border-radius: 30px;
+}
+
+#postthecomment:hover {
+    cursor: pointer;
+    background-color: #323232;
+}
+
+.arrow.active {
+    color: #f97316;
 }
