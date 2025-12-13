@@ -17,7 +17,8 @@ export const getPost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
       .populate("user")
-      .populate("community");
+      .populate("community")
+      .populate({ path: 'comments', populate: { path: 'user' } });
 
     if (!post) return res.status(404).json({ error: "Post not found" });
 

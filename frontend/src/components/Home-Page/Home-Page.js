@@ -11,7 +11,7 @@ function HomePage() {
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
-        fetch("http://localhost:5005/api/posts")
+        fetch(`/api/posts`)
         .then((res) => res.json())
         .then(setPosts)
         .catch(console.log);

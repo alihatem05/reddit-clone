@@ -1,6 +1,8 @@
 import "./Post-Page.css";
 import React, { useState, useEffect } from "react";
+import { useAuthContext } from '../../hooks/useAuthContext';
 import { useParams, useNavigate } from "react-router-dom";
+import Comment from '../Comment/Comment';
 
 function timeSince(dateString) {
   const now = new Date();
@@ -27,13 +29,17 @@ function PostPage({ }) {
   const [post, setPost] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { user: currentUser } = useAuthContext();
+  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
   useEffect(() => {
     if (!id) return;
     console.log("PostPage: fetching post id=", id);
 
     setError(null);
-    fetch(`http://localhost:5005/api/posts/${id}`)
+    fetch(`/api/posts/${id}`)
       .then(async (res) => {
         const text = await res.text();
         return JSON.parse(text);
@@ -49,7 +55,7 @@ function PostPage({ }) {
   }, [id]);
 
   const handleBackButton = (e) => {
-    navigate("/")
+    navigate(-1)
   }
 
   if (!post) return <p style={{ marginTop: "1000px", color: "white" }}>Loading...</p>;
@@ -81,7 +87,11 @@ function PostPage({ }) {
 
         <div id="middleSectionDetailed">
           {post.image && <img id="postImgD" src={post.image} />}
-          <p>{post.description || "No Description"}</p>
+          {post.description ? (
+            <p>{post.description}</p>
+          ) : (
+            <p className="no-description">No Description</p>
+          )}
         </div>
 
         <div id="bottomSectionDetailed">
@@ -113,7 +123,72 @@ function PostPage({ }) {
         }}
       ></div>
 
-      <div id="commentsSection"></div>
+      <div id="commentsSection">
+        <div style={{ display: "flex", justifyContent: "flex-end", width: "100%", marginBottom: '12px' }}>
+          <button
+            className="create-post-btn"
+            onClick={() => setIsCommentModalOpen(true)}
+          >
+            Add a Comment
+          </button>
+        </div>
+        {post.comments && post.comments.length > 0 ? (
+          post.comments.map((c) => (
+            <Comment key={c._id} comment={c} />
+          ))
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+            <p style={{ color: '#8f9496', marginTop: '10px' }}>No comments yet.</p>
+          </div>
+        )}
+        {isCommentModalOpen && (
+          <div className="modal-overlay">
+            <div className="comment-modal">
+              <h3 style={{ margin: 0 }}>Add a comment</h3>
+              <textarea
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                rows={4}
+                style={{ width: '100%', marginTop: 10, padding: 8, background: '#0f1314', color: '#fff', border: '1px solid #3e4142' }}
+                placeholder="Add your comment..."
+              />
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12, gap: 8 }}>
+                <button className="tab-arrow" onClick={() => { setIsCommentModalOpen(false); setCommentText(""); }}>Cancel</button>
+                <button
+                  className="create-post-btn"
+                  onClick={async () => {
+                    if (!commentText.trim()) return;
+                    setIsSubmittingComment(true);
+                    try {
+                      const response = await fetch(`/api/comments`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ text: commentText, user: currentUser?._id || null, post: post._id }),
+                      });
+                      const json = await response.json();
+                      if (!response.ok) {
+                        console.error('Failed to submit comment', json);
+                        setIsSubmittingComment(false);
+                        return;
+                      }
+                      // add comment to the list
+                      setPost((prev) => ({ ...prev, comments: [...(prev.comments || []), json] }));
+                      setIsCommentModalOpen(false);
+                      setCommentText("");
+                    } catch (err) {
+                      console.error(err);
+                    } finally {
+                      setIsSubmittingComment(false);
+                    }
+                  }}
+                >
+                  {isSubmittingComment ? 'Posting...' : 'Post Comment'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

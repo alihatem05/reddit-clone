@@ -101,7 +101,7 @@
 .profile-tabs {
   display: flex;
   width: 12px;
-  gap: 20px;
+  gap: 30px;
   overflow-x: auto;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE 10+ */
@@ -190,7 +190,7 @@
 
 .stat-list {
   display: flex;
-  gap: 40px;
+  gap: 50px;
 }
 
 .stat-item {

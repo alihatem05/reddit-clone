@@ -4,9 +4,8 @@ import "./Profile-Page.css";
 import useDisplayPost from '../../hooks/useDisplayPost';
 import Post from '../Post/Post';
 
-const tabs = ["Overview", "Posts", "Comments", "Upvoted", "Downvoted"];
+const tabs = ["Posts", "Comments", "Upvoted", "Downvoted"];
 
-// Reusable empty state component
 const EmptyState = ({ title }) => (
   <div className="empty-state">
     <div className="overview-snoo-container">
@@ -27,14 +26,14 @@ const EmptyState = ({ title }) => (
 
 const ProfilePage = () => {
   const { user } = useAuthContext();
-  const [activeTab, setActiveTab] = useState("Overview");
+  const [activeTab, setActiveTab] = useState("Posts");
   const tabsRef = useRef(null);
   const [posts, setPosts] = useState([]);
   const displayPost = useDisplayPost();
 
   useEffect(() => {
     if (!user || !user._id) return;
-    fetch(`http://localhost:5005/api/users/${user._id}`)
+    fetch(`/api/users/${user._id}`)
       .then((res) => res.json())
       .then((data) => setPosts(data.posts || []))
       .catch(console.log);
@@ -58,7 +57,6 @@ const ProfilePage = () => {
   };
 
   const emptyMessages = {
-    Overview: `You haven't posted anything yet`,
     Posts: `You don't have any posts yet`,
     Comments: "You don't have any comments yet",
     Upvoted: "You haven't upvoted anything yet",
@@ -80,25 +78,7 @@ const ProfilePage = () => {
             </div>
             <button className="update-settings-btn">Edit Account</button>
           </div>
-
-          
-
-          <div className="tabs-container">
-            <div className="profile-tabs" role="tablist" ref={tabsRef}>
-              {tabs.map((tab) => (
-                <span
-                  key={tab}
-                  role="tab"
-                  aria-selected={activeTab === tab}
-                  className={activeTab === tab ? "active-tab" : ""}
-                  onClick={() => setActiveTab(tab)}
-                >
-                  {tab}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div className="profile-summary-row">
+					<div className="profile-summary-row">
             <div className="stat-list">
               <div className="stat-item">
                 <p className="stat-title">Email</p>
@@ -114,16 +94,23 @@ const ProfilePage = () => {
               </div>
             </div>
           </div>
-					<div style={{ height: "1px", width: "100%", backgroundColor: "#3E4142",
-                            marginTop: "15px", marginBottom: "15px"}}></div>
+          <div className="tabs-container">
+            <div className="profile-tabs" role="tablist" ref={tabsRef}>
+              {tabs.map((tab) => (
+                <span
+                  key={tab}
+                  role="tab"
+                  aria-selected={activeTab === tab}
+                  className={activeTab === tab ? "active-tab" : ""}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab}
+                </span>
+              ))}
+            </div>
+          </div>
+					<div style={{ height: "1px", width: "100%", backgroundColor: "#3E4142", marginTop: "15px", marginBottom: "15px"}}></div>
           <div className="tab-content">
-            {activeTab === "Overview" && (
-              <div className="tab-section">
-                <button className="postButtonProf">Create Post</button>
-                <EmptyState title={emptyMessages[activeTab]} />
-              </div>
-            )}
-
             {activeTab === "Posts" && (
               <div className="tab-section">
                 <button className="postButtonProf">Create Post</button>

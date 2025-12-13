@@ -8,7 +8,7 @@ export default function Sidebar() {
   const toggleCommunities = () => setShowCommunities(!showCommunities);
 
   useEffect(() => {
-    fetch("http://localhost:5005/api/communities")
+    fetch(`/api/communities`)
       .then((response) => response.json())
       .then((data) => {
         setCommunities(data);

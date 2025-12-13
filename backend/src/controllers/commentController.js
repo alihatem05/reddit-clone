@@ -1,9 +1,10 @@
 import Comment from "../models/Comment.js";
+import Post from "../models/Post.js";
 
 export const getComments = async (req, res) => {
   try {
     const comments = await Comment.find({ post: req.params.postId })
-      .populate("user", "username");
+      .populate("user", "username avatar");
     res.json(comments);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch comments" });
@@ -13,7 +14,12 @@ export const getComments = async (req, res) => {
 export const addComment = async (req, res) => {
   try {
     const newComment = await Comment.create(req.body);
-    res.json(newComment);
+    // Push comment id into post's comments array
+    if (newComment.post) {
+      await Post.findByIdAndUpdate(newComment.post, { $push: { comments: newComment._id } });
+    }
+    const populated = await Comment.findById(newComment._id).populate('user');
+    res.json(populated);
   } catch (err) {
     res.status(500).json({ error: "Failed to add comment" });
   }

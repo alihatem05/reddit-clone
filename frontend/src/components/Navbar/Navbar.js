@@ -15,7 +15,7 @@ function Navbar() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:5005/api/communities")
+    fetch(`/api/communities`)
       .then((res) => res.json())
       .then(setCommunities)
       .catch((err) => console.log("Error fetching communities:", err));
@@ -39,12 +39,20 @@ function Navbar() {
     navigate('/profile')
   };
 
+  const handleRedditLogo = (e) => {
+    navigate('/')
+  }
+
+  const handleDoNothing = (e) => {
+    
+  }
+
   return (
     <>
       <nav aria-label="Primary navigation" id="navbar">
         <div id="nav-left">
           <a href="/" id="reddit-logo">
-            <img src={reddit_logo_path} alt="RedditClone logo" width="115" height="32" />
+            <img src={reddit_logo_path} onClick={() => handleRedditLogo()} alt="RedditClone logo" width="115" height="32" />
           </a>
 
           <div id="searchbar-nav" role="search">
