@@ -21,7 +21,7 @@ function timeSince(dateString) {
   return "few seconds ago";
 }
 
-function Post({ post, user, community, onClick }) {
+function Post({ post, user, community, onClick, readOnly = false }) {
   const displayPost = useDisplayPost();
   const handleClick = onClick || (() => displayPost(post._id));
   return (
@@ -43,15 +43,24 @@ function Post({ post, user, community, onClick }) {
             {post.image && <img id="postImg" src={post.image} />}
         </div>
         <div id="bottomSection">
-            <div id="postVote">
-              <i id="upvote" className="arrow bi bi-arrow-up" onClick={(e) => { e.stopPropagation() }}></i>
-              <p id="postVotes">{post.votes}</p>
-              <i id="downvote" className="arrow bi bi-arrow-down" onClick={(e) => { e.stopPropagation() }}></i>
-            </div>
-            <div id="commentPart">
-                <i id="comments" class="bi bi-chat"></i>
+          {!readOnly ? (
+            <>
+              <div id="postVote">
+                <i id="upvote" className="arrow bi bi-arrow-up" onClick={(e) => { e.stopPropagation() }}></i>
+                <p id="postVotes">{post.votes}</p>
+                <i id="downvote" className="arrow bi bi-arrow-down" onClick={(e) => { e.stopPropagation() }}></i>
+              </div>
+              <div id="commentPart">
+                <i id="comments" className="bi bi-chat"></i>
                 <p>{post.comments.length}</p>
+              </div>
+            </>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <p id="postVotes">{post.votes} votes</p>
+              <p>{post.comments.length} comments</p>
             </div>
+          )}
         </div>
     </div>
   );

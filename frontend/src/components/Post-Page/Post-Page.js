@@ -62,7 +62,7 @@ function PostPage({ }) {
       <div id="postDetailed">
         <div id="upperSectionDetailed">
           <div id="postInfoDetailed">
-            <i id="backButton" class="bi bi-arrow-left-circle" onClick={() => handleBackButton()}></i>
+            <i id="backButton" className="bi bi-arrow-left-circle" onClick={() => handleBackButton()}></i>
             {community?.logo && <img id="subLogoDetailed" src={community.logo} />}
             <div id="postInfoInnerDetailed">
               <div id="yarabD">

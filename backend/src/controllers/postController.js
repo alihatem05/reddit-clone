@@ -1,4 +1,5 @@
 import Post from "../models/Post.js";
+import User from "../models/User.js";
 
 export const getPosts = async (req, res) => {
   try {
@@ -29,7 +30,12 @@ export const getPost = async (req, res) => {
 export const createPost = async (req, res) => {
   try {
     const newPost = await Post.create(req.body);
-    res.json(newPost);
+    // add post reference to user's posts array
+    if (newPost.user) {
+      await User.findByIdAndUpdate(newPost.user, { $push: { posts: newPost._id } });
+    }
+    const populated = await Post.findById(newPost._id).populate('user').populate('community');
+    res.json(populated);
   } catch (err) {
     res.status(500).json({ error: "Failed to create post" });
   }

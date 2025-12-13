@@ -35,6 +35,10 @@ function Navbar() {
     logout()
   };
 
+  const handleProfile = (e) => {
+    navigate('/profile')
+  };
+
   return (
     <>
       <nav aria-label="Primary navigation" id="navbar">
@@ -83,7 +87,7 @@ function Navbar() {
           <div id="pSection">
             <img id="userProfilePfp" src={`/pfps/${user?.avatar}`} alt="User avatar" />
             <div id="dropdown">
-              <p>Account</p>
+              <p onClick={() => handleProfile()}>Account</p>
               <p onClick={() => handleLogout()}>Logout</p>
             </div>
           </div>

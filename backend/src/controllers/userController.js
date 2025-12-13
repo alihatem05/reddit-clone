@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import Post from "../models/Post.js";
 import jwt from "jsonwebtoken";
 
 const createToken = (_id) => {
@@ -16,9 +17,14 @@ export const getUsers = async (req, res) => {
 
 export const getUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id).lean();
     if (!user) return res.status(404).json({ error: "User not found" });
 
+    const posts = await Post.find({ user: req.params.id })
+      .populate('user')
+      .populate('community');
+
+    user.posts = posts;
     res.json(user);
   } catch (err) {
     res.status(400).json({ error: err.message });
