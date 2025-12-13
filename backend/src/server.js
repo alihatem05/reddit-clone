@@ -11,7 +11,10 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true
+}));
 app.use(express.json());
 
 app.use("/api/users", userRoutes);
@@ -19,7 +22,7 @@ app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/communities", communityRoutes);
 
-const PORT = process.env.PORT || 5005;
+const PORT = process.env.PORT;
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
