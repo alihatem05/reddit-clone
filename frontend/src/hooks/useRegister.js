@@ -17,12 +17,22 @@ export const useRegister = () => {
                 body: JSON.stringify({username, email, password})
             })
 
+            const text = await response.text().catch(() => null)
             let json = null
-            try { json = await response.json() } catch (e) { throw new Error('Unexpected server response') }
+            const contentType = response.headers.get('content-type') || ''
+
+            if (contentType.includes('application/json')) {
+                try { json = JSON.parse(text) } catch (e) { console.warn('Register: invalid JSON', text); throw new Error('Unexpected server response'); }
+            } else if (text && text.trim().startsWith('<')) {
+                console.warn('Register: received HTML', text.slice(0,200));
+                throw new Error('Server returned non-JSON response (check backend)')
+            } else if (text) {
+                try { json = JSON.parse(text) } catch (e) { throw new Error(text) }
+            }
 
             if (!response.ok) {
                 setIsLoading(false)
-                setError(json?.error || json?.message || 'Registration failed')
+                setError(json?.error || json?.message || (typeof json === 'string' ? json : 'Registration failed'))
                 return null
             }
 
