@@ -1,4 +1,5 @@
 import './Post.css'
+import useDisplayPost from '../../hooks/useDisplayPost'
 
 function timeSince(dateString) {
   const now = new Date();
@@ -20,24 +21,11 @@ function timeSince(dateString) {
   return "few seconds ago";
 }
 
-function vote(post, up_or_down) {
-  const action = up_or_down === "up" ? post.votes + 1
-                 : up_or_down === "down" ? post.votes - 1
-                 : post.votes;
-
-  fetch(`http://localhost:5005/api/posts/${post._id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ votes: action })
-  })
-    .then(res => res.json())
-    .then(data => console.log("Updated:", data))
-    .catch(err => console.error(err));
-}
-
 function Post({ post, user, community, onClick }) {
+  const displayPost = useDisplayPost();
+  const handleClick = onClick || (() => displayPost(post._id));
   return (
-    <div className="singlePost" onClick={onClick} style={{ cursor: "pointer" }}>
+    <div className="singlePost" onClick={handleClick} style={{ cursor: "pointer" }}>
         <div id="upperSection">
             <div id="postInfo">
                 {community?.logo && <img id="subLogo" src={community.logo}/>}
@@ -56,9 +44,9 @@ function Post({ post, user, community, onClick }) {
         </div>
         <div id="bottomSection">
             <div id="postVote">
-              <i id="upvote" className="arrow bi bi-arrow-up" onClick={(e) => { e.stopPropagation(); vote(post, "up") }}></i>
+              <i id="upvote" className="arrow bi bi-arrow-up" onClick={(e) => { e.stopPropagation() }}></i>
               <p id="postVotes">{post.votes}</p>
-              <i id="downvote" className="arrow bi bi-arrow-down" onClick={(e) => { e.stopPropagation(); vote(post, "down") }}></i>
+              <i id="downvote" className="arrow bi bi-arrow-down" onClick={(e) => { e.stopPropagation() }}></i>
             </div>
             <div id="commentPart">
                 <i id="comments" class="bi bi-chat"></i>

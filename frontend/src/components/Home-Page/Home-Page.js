@@ -1,11 +1,12 @@
 import "./Home-Page.css"
 import Post from './../Post/Post'
 import { useState, useEffect} from "react"
-import { useNavigate } from "react-router-dom";
+// navigation handled by useDisplayPost
+import useDisplayPost from "../../hooks/useDisplayPost";
 import React from "react";
 
 function HomePage() {
-    const navigate = useNavigate();
+    const displayPost = useDisplayPost();
 
     const [posts, setPosts] = useState([]);
 
@@ -27,7 +28,7 @@ function HomePage() {
                         user={p.user}
                         community={p.community}
                         post={p}
-                        onClick={() => navigate(`/post/${p._id}`)}
+                        onClick={() => displayPost(p._id)}
                         />
                         <div style={{ height: "1px", width: "100%", backgroundColor: "#3E4142",
                             marginTop: "15px", marginBottom: "15px"}}></div>

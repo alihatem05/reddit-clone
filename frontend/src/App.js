@@ -16,7 +16,7 @@ function App() {
   const isLoggedIn = !!user;
 
   return (
-    <BrowserRouter>
+    <div>
       {isLoggedIn && (
         <>
           <Navbar />
@@ -24,32 +24,32 @@ function App() {
         </>
       )}
 
+      <Routes>
+          <Route
+          path="/login"
+          element={!isLoggedIn ? <Login /> : <Navigate to="/" />}
+          />
+
+          <Route
+          path="/register"
+          element={!isLoggedIn ? <Register /> : <Navigate to="/" />}
+          />
+      </Routes>
+
+      <div className="mainPage">
         <Routes>
-            <Route
-            path="/login"
-            element={!isLoggedIn ? <Login /> : <Navigate to="/" />}
-            />
+          <Route
+            path="/"
+            element={isLoggedIn ? <HomePage /> : <Navigate to="/login" />}
+          />
 
-            <Route
-            path="/register"
-            element={!isLoggedIn ? <Register /> : <Navigate to="/" />}
-            />
+          <Route
+            path="/post/:id"
+            element={isLoggedIn ? <PostPage /> : <Navigate to="/login" />}
+          />
         </Routes>
-
-        <div id="mainPage">
-            <Routes>
-                <Route
-                path="/"
-                element={isLoggedIn ? <HomePage /> : <Navigate to="/login" />}
-                />
-
-                <Route
-                path="/post/:id"
-                element={isLoggedIn ? <PostPage /> : <Navigate to="/login" />}
-                />
-            </Routes>
-        </div>
-    </BrowserRouter>
+      </div>
+    </div>
   );
 }
 

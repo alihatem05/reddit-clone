@@ -38,12 +38,21 @@
     gap: 4px;
     font-size: 14px;
     padding-bottom: 5px;
+    align-items: center;
 }
 
 #postInfoInnerDetailed {
     display: flex;
     flex-direction: column;
     gap: 0px;
+}
+
+#backButton {
+    font-size: 28px;
+}
+
+#backButton:hover {
+    cursor: pointer;
 }
 
 #subredditD {

@@ -1,6 +1,6 @@
 import "./Post-Page.css";
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 function timeSince(dateString) {
   const now = new Date();
@@ -22,32 +22,37 @@ function timeSince(dateString) {
   return "few seconds ago";
 }
 
-function vote(post, up_or_down, setPost) {
-  const action =
-    up_or_down === "up" ? post.votes + 1 : up_or_down === "down" ? post.votes - 1 : post.votes;
-
-  fetch(`http://localhost:5005/api/posts/${post._id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ votes: action }),
-  })
-    .then((res) => res.json())
-    .then((updatedPost) => setPost(updatedPost))
-    .catch((err) => console.error(err));
-}
-
-function PostPage({ posts = [], users = [], communities = [] }) {
+function PostPage({ }) {
   const { id } = useParams();
   const [post, setPost] = useState(null);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const foundPost = posts.find((p) => p._id === id);
-    if (foundPost) {
-      setPost(foundPost);
-    }
-  }, [id, posts]);
+    if (!id) return;
+    console.log("PostPage: fetching post id=", id);
 
-  if (!post) return <p>Loading...</p>;
+    setError(null);
+    fetch(`http://localhost:5005/api/posts/${id}`)
+      .then(async (res) => {
+        const text = await res.text();
+        return JSON.parse(text);
+      })
+      .then((data) => {
+        console.log("Post fetch data:", data);
+        if (data) setPost(data);
+      })
+      .catch((err) => {
+        console.error("Fetch post error:", err);
+        setError(err.message || "Failed to fetch post");
+      });
+  }, [id]);
+
+  const handleBackButton = (e) => {
+    navigate("/")
+  }
+
+  if (!post) return <p style={{ marginTop: "1000px", color: "white" }}>Loading...</p>;
 
   const user = (typeof post.user === "object" ? post.user : null);
   const community = (typeof post.community === "object" ? post.community : null);
@@ -57,6 +62,7 @@ function PostPage({ posts = [], users = [], communities = [] }) {
       <div id="postDetailed">
         <div id="upperSectionDetailed">
           <div id="postInfoDetailed">
+            <i id="backButton" class="bi bi-arrow-left-circle" onClick={() => handleBackButton()}></i>
             {community?.logo && <img id="subLogoDetailed" src={community.logo} />}
             <div id="postInfoInnerDetailed">
               <div id="yarabD">
@@ -83,13 +89,11 @@ function PostPage({ posts = [], users = [], communities = [] }) {
             <i
               id="upvoteD"
               className="arrow bi bi-arrow-up"
-              onClick={() => vote(post, "up", setPost)}
             ></i>
             <p id="postVotesD">{post.votes}</p>
             <i
               id="downvoteD"
               className="arrow bi bi-arrow-down"
-              onClick={() => vote(post, "down", setPost)}
             ></i>
           </div>
           <div id="commentPartD">
