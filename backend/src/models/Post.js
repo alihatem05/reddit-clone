@@ -11,9 +11,8 @@ const PostSchema = new mongoose.Schema(
     comments:   [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" , default: []}],
     upvoters: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
     downvoters: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
-    votes:      { type: Number, default: 0 },
-    comments: { type: [mongoose.Schema.Types.ObjectId], ref: "Comment", default: [] }
-  },
+    votes:      { type: Number, default: 0 }
+    },
   { timestamps: true }
 );
 

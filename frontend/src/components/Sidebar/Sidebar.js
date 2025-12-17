@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 
 export default function Sidebar() {
   const [showCommunities, setShowCommunities] = useState(false);
   const [communities, setCommunities] = useState([]);
+  const navigate = useNavigate();
 
   const toggleCommunities = () => setShowCommunities(!showCommunities);
+
+  const handleCommunityClick = (communityId, e) => {
+    e.stopPropagation();
+    navigate(`/community/${communityId}`);
+  };
 
   useEffect(() => {
     fetch(`/api/communities`)
@@ -52,9 +59,14 @@ export default function Sidebar() {
         <div className={`communities-dropdown ${showCommunities ? "open" : ""}`}>
           {communities.length === 0 && <p>No communities yet.</p>}
                 {communities.map((c) => (
-                    <>
-                        <a key={c._id} className="communityItem">r/{c.name}</a>
-                    </>
+                    <a 
+                        key={c._id} 
+                        className="communityItem"
+                        onClick={(e) => handleCommunityClick(c._id, e)}
+                        style={{ cursor: "pointer" }}
+                    >
+                        r/{c.name}
+                    </a>
                 ))}
         </div>
       </div>

@@ -42,13 +42,24 @@ export const joinCommunity = async (req, res) => {
     if (!user || !community)
       return res.status(404).json({ error: "User or Community not found" });
 
-    if (user.joinedCommunities?.includes(community._id))
+    // Check if user is already a member
+    const userCommunities = user.communities?.map(c => c.toString()) || [];
+    if (userCommunities.includes(community._id.toString()))
       return res.json({ message: "Already a member" });
 
-    user.joinedCommunities.push(community._id);
+    // Add community to user's communities
+    user.communities = user.communities || [];
+    user.communities.push(community._id);
     await user.save();
 
-    res.json({ message: "Joined community", user });
+    // Add user to community's members
+    community.members = community.members || [];
+    if (!community.members.includes(user._id)) {
+      community.members.push(user._id);
+      await community.save();
+    }
+
+    res.json({ message: "Joined community", user, community });
   } catch (err) {
     res.status(500).json({ error: "Failed to join community" });
   }
@@ -64,13 +75,19 @@ export const leaveCommunity = async (req, res) => {
     if (!user || !community)
       return res.status(404).json({ error: "User or Community not found" });
 
-    user.joinedCommunities = user.joinedCommunities.filter(
+    // Remove community from user's communities
+    user.communities = (user.communities || []).filter(
       (c) => c.toString() !== community._id.toString()
     );
-
     await user.save();
 
-    res.json({ message: "Left community", user });
+    // Remove user from community's members
+    community.members = (community.members || []).filter(
+      (m) => m.toString() !== user._id.toString()
+    );
+    await community.save();
+
+    res.json({ message: "Left community", user, community });
   } catch (err) {
     res.status(500).json({ error: "Failed to leave community" });
   }

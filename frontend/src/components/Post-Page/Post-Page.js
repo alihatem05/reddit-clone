@@ -228,6 +228,14 @@ function PostPage({ }) {
     navigate(-1)
   }
 
+  const handleCommunityClick = (e) => {
+    e.stopPropagation();
+    if (post.community) {
+      const communityId = typeof post.community === "object" ? post.community._id : post.community;
+      navigate(`/community/${communityId}`);
+    }
+  };
+
   if (!post) return <p style={{ marginTop: "1000px", color: "white" }}>Loading...</p>;
 
   const user = (typeof post.user === "object" ? post.user : null);
@@ -239,10 +247,24 @@ function PostPage({ }) {
         <div id="upperSectionDetailed">
           <div id="postInfoDetailed">
             <i id="backButton" className="bi bi-arrow-left-circle" onClick={() => handleBackButton()}></i>
-            {community?.logo && <img id="subLogoDetailed" src={community.logo} />}
+            {community?.logo && (
+              <img 
+                id="subLogoDetailed" 
+                src={community.logo}
+                onClick={handleCommunityClick}
+                style={{ cursor: "pointer" }}
+                alt={community.name}
+              />
+            )}
             <div id="postInfoInnerDetailed">
               <div id="yarabD">
-                <p id="subredditD">r/{community?.name || "Unknown"}</p>
+                <p 
+                  id="subredditD"
+                  onClick={handleCommunityClick}
+                  style={{ cursor: "pointer" }}
+                >
+                  r/{community?.name || "Unknown"}
+                </p>
                 <p id="tagoD">{timeSince(post.createdAt)}</p>
               </div>
               <div id="accountInfoDet">
