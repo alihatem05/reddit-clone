@@ -1,0 +1,238 @@
+.create-post-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(2px);
+}
+
+.create-post-modal {
+  background-color: #1C1F23;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border: 1px solid #3E4142;
+}
+
+.create-post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #3E4142;
+}
+
+.create-post-header h2 {
+  color: #e6e6e6;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #e6e6e6;
+  font-size: 32px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+  background-color: #3E4142;
+}
+
+.create-post-form {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  color: #e6e6e6;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="url"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: #2A3236;
+  border: 1px solid #3E4142;
+  border-radius: 4px;
+  color: #e6e6e6;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #D93900;
+  box-shadow: 0 0 0 2px rgba(217, 57, 0, 0.2);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.form-group select {
+  cursor: pointer;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #80A2Aa;
+}
+
+.error-message {
+  background-color: rgba(217, 57, 0, 0.1);
+  border: 1px solid #D93900;
+  color: #ff6b6b;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #3E4142;
+}
+
+.cancel-btn,
+.submit-btn {
+  padding: 10px 24px;
+  border-radius: 24px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.cancel-btn {
+  background-color: #2A3236;
+  color: #e6e6e6;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background-color: #3E4142;
+}
+
+.submit-btn {
+  background-color: #D93900;
+  color: #e6e6e6;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background-color: #AE2C00;
+}
+
+.cancel-btn:disabled,
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Scrollbar styling */
+.create-post-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.create-post-modal::-webkit-scrollbar-track {
+  background: #1C1F23;
+}
+
+.create-post-modal::-webkit-scrollbar-thumb {
+  background: #3E4142;
+  border-radius: 4px;
+}
+
+.create-post-modal::-webkit-scrollbar-thumb:hover {
+  background: #4A4E52;
+}
+
+.image-preview-container {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.image-preview {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  border: 1px solid #3E4142;
+  object-fit: contain;
+  background-color: #0E1113;
+}
+
+.image-preview-error {
+  padding: 20px;
+  background-color: rgba(217, 57, 0, 0.1);
+  border: 1px solid #D93900;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.image-preview-error p {
+  color: #ff6b6b;
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.image-preview-error small {
+  color: #80A2Aa;
+  font-size: 12px;
+}
+
+.remove-image-btn {
+  padding: 6px 12px;
+  background-color: #2A3236;
+  color: #e6e6e6;
+  border: 1px solid #3E4142;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  align-self: flex-start;
+}
+
+.remove-image-btn:hover {
+  background-color: #3E4142;
+}
+

@@ -1,0 +1,144 @@
+.community-page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  color: white;
+  min-height: 100vh;
+  padding: 20px;
+  margin-left: 272px;
+  margin-right: 330px;
+}
+
+.community-header {
+  background-color: #1C1F23;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #3E4142;
+}
+
+.community-info {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.community-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3E4142;
+}
+
+.community-details {
+  flex: 1;
+}
+
+.community-details h1 {
+  margin: 0 0 10px 0;
+  font-size: 28px;
+  color: #e6e6e6;
+}
+
+.community-description {
+  color: #b0b3b8;
+  margin: 10px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.community-stats {
+  display: flex;
+  gap: 10px;
+  color: #888;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.community-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.join-btn,
+.leave-btn {
+  padding: 8px 24px;
+  border-radius: 24px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.join-btn {
+  background-color: #D93900;
+  color: #e6e6e6;
+}
+
+.join-btn:hover {
+  background-color: #AE2C00;
+}
+
+.leave-btn {
+  background-color: #2A3236;
+  color: #e6e6e6;
+  border: 1px solid #3E4142;
+}
+
+.leave-btn:hover {
+  background-color: #3E4142;
+}
+
+.create-post-btn {
+  padding: 8px 24px;
+  border-radius: 24px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: #D93900;
+  color: #e6e6e6;
+  transition: background-color 0.2s;
+}
+
+.create-post-btn:hover {
+  background-color: #AE2C00;
+}
+
+.community-posts {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.empty-community {
+  text-align: center;
+  padding: 60px 20px;
+  color: #888;
+}
+
+.empty-community p {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.create-first-post-btn {
+  padding: 12px 24px;
+  border-radius: 24px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: #D93900;
+  color: #e6e6e6;
+  transition: background-color 0.2s;
+}
+
+.create-first-post-btn:hover {
+  background-color: #AE2C00;
+}
+
