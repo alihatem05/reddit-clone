@@ -8,7 +8,8 @@ import HomePage from "./components/Home-Page/Home-Page";
 import PostPage from "./components/Post-Page/Post-Page";
 import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
-import ProfilePage from "./components/Profile-Page/Profile-Page"
+import ProfilePage from "./components/Profile-Page/Profile-Page";
+import CommunityPage from "./components/Community-Page/Community-Page";
 
 import "./App.css";
 
@@ -44,6 +45,8 @@ function App() {
           <Route path="/post/:id" element={isLoggedIn ? <PostPage /> : <Navigate to="/login" />}/>
 
           <Route path="/profile" element={isLoggedIn ? <ProfilePage /> : <Navigate to="/login" />}/>
+
+          <Route path="/community/:id" element={isLoggedIn ? <CommunityPage /> : <Navigate to="/login" />}/>
         </Routes>
       </div>
     </div>

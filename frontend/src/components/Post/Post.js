@@ -1,6 +1,7 @@
 import './Post.css'
 import useDisplayPost from '../../hooks/useDisplayPost'
 import { useAuthContext } from '../../hooks/useAuthContext'
+import { useNavigate } from 'react-router-dom'
 import React, { useState, useEffect } from 'react'
 
 function timeSince(dateString) {
@@ -26,9 +27,17 @@ function timeSince(dateString) {
 function Post({ post, user, community, onClick, readOnly = false }) {
   const displayPost = useDisplayPost();
   const { user: currentUser } = useAuthContext();
+  const navigate = useNavigate();
   const [localPost, setLocalPost] = useState(post);
   useEffect(() => setLocalPost(post), [post]);
   const handleClick = onClick || (() => displayPost(post._id));
+  
+  const handleCommunityClick = (e) => {
+    e.stopPropagation();
+    if (community?._id) {
+      navigate(`/community/${community._id}`);
+    }
+  };
   const userInArray = (arr) => {
     if (!currentUser || !arr) return false;
     return arr.some(u => String(typeof u === 'object' ? u._id : u) === String(currentUser._id));
@@ -93,10 +102,24 @@ function Post({ post, user, community, onClick, readOnly = false }) {
     <div className="singlePost" onClick={handleClick} style={{ cursor: "pointer" }}>
         <div id="upperSection">
             <div id="postInfo">
-                {community?.logo && <img id="subLogo" src={community.logo}/>}
+                {community?.logo && (
+                    <img 
+                        id="subLogo" 
+                        src={community.logo}
+                        onClick={handleCommunityClick}
+                        style={{ cursor: "pointer" }}
+                        alt={community.name}
+                    />
+                )}
                 <div id="postInfoInner">
                     <div id="yarab">
-                        <p id="subreddit">r/{community?.name || "Unknown"}</p>
+                        <p 
+                            id="subreddit"
+                            onClick={handleCommunityClick}
+                            style={{ cursor: "pointer" }}
+                        >
+                            r/{community?.name || "Unknown"}
+                        </p>
                         <p id="tago">{timeSince(post.createdAt)}</p>
                     </div>
                     <p id="user">u/{user?.username || "Anonymous"}</p>
@@ -106,6 +129,7 @@ function Post({ post, user, community, onClick, readOnly = false }) {
         </div>
         <div id="middleSection">
             {post.image && <img id="postImg" src={post.image} />}
+            {post.description && <p id="postDescription">{post.description}</p>}
         </div>
         <div id="bottomSection">
           {!readOnly ? (

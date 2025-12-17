@@ -81,3 +81,19 @@
 .bi-caret-down-fill {
   transition: transform 0.3s ease;
 }
+
+.communityItem {
+  display: block;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.communityItem:hover {
+  background-color: #181C1F;
+  text-decoration: underline;
+}
