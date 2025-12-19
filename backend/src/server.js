@@ -22,6 +22,14 @@ app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/communities", communityRoutes);
 
+// 404 handler for unmatched API routes (Express 5 compatible)
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: "API endpoint not found" });
+  }
+  next();
+});
+
 const PORT = process.env.PORT;
 
 mongoose.connect(process.env.MONGO_URI)

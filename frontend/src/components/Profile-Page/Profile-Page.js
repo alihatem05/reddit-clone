@@ -3,6 +3,7 @@ import { useAuthContext } from "../../hooks/useAuthContext";
 import "./Profile-Page.css";
 import useDisplayPost from '../../hooks/useDisplayPost';
 import Post from '../Post/Post';
+import EditProfileModal from './EditProfileModal';
 
 const tabs = ["Posts", "Comments", "Upvoted", "Downvoted"];
 
@@ -30,6 +31,7 @@ const ProfilePage = () => {
   const tabsRef = useRef(null);
   const [posts, setPosts] = useState([]);
   const displayPost = useDisplayPost();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     if (!user || !user._id) return;
@@ -69,14 +71,24 @@ const ProfilePage = () => {
         <div className="profile-main">
           <div className="profile-header">
             <div className="avatar-container">
-              <img src={`/pfps/${user?.avatar}`} alt={`${username} avatar`} className="profile-avatar" />
-              <button className="edit-avatar-btn" aria-label="Edit profile avatar">✎</button>
+              <img 
+                src={user?.avatar?.startsWith('data:image/') ? user.avatar : `/pfps/${user?.avatar || 'gray.png'}`} 
+                alt={`${username} avatar`} 
+                className="profile-avatar" 
+              />
+              <button 
+                className="edit-avatar-btn" 
+                aria-label="Edit profile avatar"
+                onClick={() => setIsEditModalOpen(true)}
+              >
+                ✎
+              </button>
             </div>
             <div className="profile-info">
               <h1 className="profile-name">{username}</h1>
               <p className="profile-username">u/{username}</p>
             </div>
-            <button className="update-settings-btn">Edit Account</button>
+           
           </div>
 					<div className="profile-summary-row">
             <div className="stat-list">
@@ -95,6 +107,13 @@ const ProfilePage = () => {
             </div>
           </div>
           <div className="tabs-container">
+            <button 
+              className="tab-arrow" 
+              onClick={() => scrollTabs("left")}
+              aria-label="Scroll tabs left"
+            >
+              ‹
+            </button>
             <div className="profile-tabs" role="tablist" ref={tabsRef}>
               {tabs.map((tab) => (
                 <span
@@ -108,6 +127,13 @@ const ProfilePage = () => {
                 </span>
               ))}
             </div>
+            <button 
+              className="tab-arrow" 
+              onClick={() => scrollTabs("right")}
+              aria-label="Scroll tabs right"
+            >
+              ›
+            </button>
           </div>
 					<div style={{ height: "1px", width: "100%", backgroundColor: "#3E4142", marginTop: "15px", marginBottom: "15px"}}></div>
           <div className="tab-content">
@@ -135,6 +161,11 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
+      <EditProfileModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        user={user}
+      />
     </div>
   );
 };
