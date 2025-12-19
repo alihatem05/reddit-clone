@@ -1,6 +1,7 @@
 import Community from "../models/Community.js";
 import Post from "../models/Post.js";
 import User from "../models/User.js";
+import Comment from "../models/Comment.js";
 
 export const getCommunities = async (req, res) => {
   try {
@@ -117,6 +118,15 @@ export const deleteCommunity = async (req, res) => {
     // Check if user is the creator
     if (community.createdBy.toString() !== userId) {
       return res.status(403).json({ error: "Only the creator can delete this community" });
+    }
+
+    // Find all posts in this community
+    const posts = await Post.find({ community: community._id });
+    const postIds = posts.map(post => post._id);
+
+    // Delete all comments associated with posts in this community
+    if (postIds.length > 0) {
+      await Comment.deleteMany({ post: { $in: postIds } });
     }
 
     // Delete all posts in this community
