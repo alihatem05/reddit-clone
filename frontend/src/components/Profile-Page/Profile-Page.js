@@ -66,12 +66,10 @@ const ProfilePage = () => {
   useEffect(() => {
     fetchUserData();
     
-    // Listen for vote events to refresh profile data
     const handleVoteEvent = () => {
       fetchUserData();
     };
     
-    // Listen for comment creation events
     const handleCommentCreated = () => {
       fetchUserData();
     };

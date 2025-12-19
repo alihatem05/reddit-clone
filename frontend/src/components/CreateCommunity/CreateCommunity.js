@@ -105,13 +105,10 @@ function CreateCommunity({ onClose, onCommunityCreated }) {
 
   const handleNext = () => {
     if (currentStep === 1) {
-      // Step 1: Category selection - optional, can skip
       setCurrentStep(2);
     } else if (currentStep === 2) {
-      // Step 2: Type selection - always valid
       setCurrentStep(3);
     } else if (currentStep === 3) {
-      // Step 3: Name - validate before proceeding
       if (!formData.name.trim()) {
         setError("Community name is required");
         return;
@@ -161,6 +158,7 @@ function CreateCommunity({ onClose, onCommunityCreated }) {
         description: formData.description.trim(),
         type: formData.type,
         createdBy: user._id,
+        logo: "https://st2.depositphotos.com/1432405/8410/v/450/depositphotos_84106432-stock-illustration-saturn-icon-simple.jpg",
       };
 
       const topic = formData.topic.trim();

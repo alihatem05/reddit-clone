@@ -2,6 +2,7 @@ import "./Post-Page.css";
 import React, { useState, useEffect } from "react";
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useParams, useNavigate } from "react-router-dom";
+import { useVote } from '../../hooks/useVote';
 import Comment from '../Comment/Comment';
 
 function timeSince(dateString) {
@@ -70,10 +71,7 @@ function PostPage({ }) {
     }
   };
 
-  const userInArray = (arr) => {
-    if (!currentUser || !arr) return false;
-    return arr.some(u => String(typeof u === 'object' ? u._id : u) === String(currentUser._id));
-  };
+  const { handleVote: handleVotePost, hasUpvoted, hasDownvoted } = useVote(post, setPost, 'post');
 
   const handlePostComment = async ({ text, parentId = null }) => {
     if (!text || !text.trim()) return null;
@@ -94,7 +92,6 @@ function PostPage({ }) {
       } else {
         setPost(prev => ({ ...prev, comments: [...(prev.comments || []), json] }));
       }
-      // Dispatch event to notify profile page
       window.dispatchEvent(new CustomEvent('commentCreated'));
       return json;
     } catch (err) {
@@ -117,7 +114,6 @@ function PostPage({ }) {
       const replaceComment = (commentsArray) => {
         return commentsArray.map(c => {
           if (String(c._id) === String(commentId)) {
-            // return the updated object; ensure replies field is present
             return { ...c, ...updated };
           }
           if (c.replies && c.replies.length) {
@@ -127,60 +123,7 @@ function PostPage({ }) {
         });
       };
       setPost(prev => ({ ...prev, comments: replaceComment(prev.comments || []) }));
-      // Dispatch event to notify profile page
       window.dispatchEvent(new CustomEvent('commentVoted'));
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleVotePost = async (delta) => {
-    const hasUp = userInArray(post.upvoters);
-    const hasDown = userInArray(post.downvoters);
-    let outDelta = delta;
-    if (delta === 1 && hasUp) outDelta = 0;
-    if (delta === -1 && hasDown) outDelta = 0;
-    // optimistic update
-    setPost(prev => {
-      const p = { ...prev };
-      if (outDelta === 0) {
-        if (hasUp) {
-          p.votes -= 1;
-          p.upvoters = p.upvoters.filter(u => String(typeof u === 'object' ? u._id : u) !== String(currentUser._id));
-        } else if (hasDown) {
-          p.votes += 1;
-          p.downvoters = p.downvoters.filter(u => String(typeof u === 'object' ? u._id : u) !== String(currentUser._id));
-        }
-      } else if (outDelta === 1) {
-        if (hasDown) {
-          p.votes += 2; // switch
-          p.downvoters = p.downvoters.filter(u => String(typeof u === 'object' ? u._id : u) !== String(currentUser._id));
-        } else {
-          p.votes += 1;
-        }
-        p.upvoters = [...(p.upvoters || []), currentUser._id];
-      } else if (outDelta === -1) {
-        if (hasUp) {
-          p.votes -= 2; // switch
-          p.upvoters = p.upvoters.filter(u => String(typeof u === 'object' ? u._id : u) !== String(currentUser._id));
-        } else {
-          p.votes -= 1;
-        }
-        p.downvoters = [...(p.downvoters || []), currentUser._id];
-      }
-      return p;
-    });
-    try {
-      const res = await fetch(`/api/posts/${post._id}/vote`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ delta: outDelta, userId: currentUser?._id || null }),
-      });
-      const updated = await res.json();
-      if (!res.ok) return;
-      setPost(updated);
-      // Dispatch event to notify profile page
-      window.dispatchEvent(new CustomEvent('postVoted'));
     } catch (err) {
       console.error(err);
     }
@@ -292,9 +235,9 @@ function PostPage({ }) {
 
           <div id="bottomSectionDetailed">
             <div id="postVoteD">
-              <i id="upvoteD" className={`arrow bi bi-arrow-up ${userInArray(post.upvoters) ? 'active' : ''}`} onClick={() => { if (currentUser) handleVotePost(1); }} style={{ color: userInArray(post.upvoters) ? '#f97316' : undefined }}></i>
+              <i id="upvoteD" className={`arrow bi bi-arrow-up ${hasUpvoted ? 'active' : ''}`} onClick={() => handleVotePost(1)} style={{ color: hasUpvoted ? '#f97316' : undefined }}></i>
               <p id="postVotesD">{post.votes}</p>
-              <i id="downvoteD" className={`arrow bi bi-arrow-down ${userInArray(post.downvoters) ? 'active' : ''}`} onClick={() => { if (currentUser) handleVotePost(-1); }} style={{ color: userInArray(post.downvoters) ? '#0ea5e9' : undefined }}></i>
+              <i id="downvoteD" className={`arrow bi bi-arrow-down ${hasDownvoted ? 'active' : ''}`} onClick={() => handleVotePost(-1)} style={{ color: hasDownvoted ? '#0ea5e9' : undefined }}></i>
             </div>
             <div id="commentPartD">
               <i id="commentsD" className="bi bi-chat"></i>

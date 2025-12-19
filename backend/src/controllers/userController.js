@@ -176,23 +176,19 @@ export const updateUser = async (req, res) => {
     const { id } = req.params;
     const { username, email, avatar } = req.body;
 
-    // Validate ID format using Mongoose's built-in validation
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: "Invalid user ID format" });
     }
 
-    // Find the user
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Validate email if provided
     if (email && !validator.isEmail(email)) {
       return res.status(400).json({ error: "Incorrect email structure!" });
     }
 
-    // Check if email is already taken by another user
     if (email && email !== user.email) {
       const emailExists = await User.findOne({ email });
       if (emailExists) {
@@ -200,7 +196,6 @@ export const updateUser = async (req, res) => {
       }
     }
 
-    // Check if username is already taken by another user
     if (username && username !== user.username) {
       const usernameExists = await User.findOne({ username });
       if (usernameExists) {
@@ -208,16 +203,12 @@ export const updateUser = async (req, res) => {
       }
     }
 
-    // Update fields
-    // For avatars: if it's a base64 data URL (custom upload), store it as-is
-    // If it's a filename (from pfps folder), store the filename
     if (username) user.username = username;
     if (email) user.email = email;
     if (avatar) user.avatar = avatar;
 
     await user.save();
 
-    // Return updated user without password
     const updatedUser = await User.findById(id).select('-password');
 
     res.status(200).json({

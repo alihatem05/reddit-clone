@@ -76,6 +76,10 @@
   color: #80A2Aa;
 }
 
+.logo:hover {
+    cursor: pointer;
+}
+
 .search-dropdown {
   position: absolute;
   top: 45px;

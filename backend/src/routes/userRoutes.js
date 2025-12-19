@@ -12,16 +12,13 @@ import {
 
 const router = express.Router();
 
-// Specific routes first
-router.post("/register", createUser);     // Register
-router.post("/login", loginUser);  // Login
-router.get("/", getUsers);        // Get all
-// User-specific data routes (before :id route)
+router.post("/register", createUser);
+router.post("/login", loginUser);
+router.get("/", getUsers);
 router.get("/:id/comments", getUserComments);
 router.get("/:id/upvoted", getUserUpvotedPosts);
 router.get("/:id/downvoted", getUserDownvotedPosts);
-// Parameterized routes last
-router.patch("/:id", updateUser);  // Update user
-router.get("/:id", getUser);      // Get one
+router.patch("/:id", updateUser);
+router.get("/:id", getUser);
 
 export default router;

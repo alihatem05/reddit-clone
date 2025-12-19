@@ -45,7 +45,6 @@ export const useUpdateProfile = () => {
                 return null
             }
 
-            // Update localStorage and context
             localStorage.setItem("user", JSON.stringify(json.user))
             dispatch({ type: 'UPDATE_USER', payload: json.user })
             setIsLoading(false)

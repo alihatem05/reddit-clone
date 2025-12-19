@@ -84,11 +84,10 @@ function Navbar() {
         </div>
 
         <div id="nav-right">
-          <a href="/" className="logo">
+          <a className="logo">
             <i className="bi bi-chat-dots" />
           </a>
           <a 
-            href="/" 
             className="logo"
             onClick={(e) => {
               e.preventDefault();
@@ -99,7 +98,7 @@ function Navbar() {
           >
             <i className="bi bi-plus-square" />
           </a>
-          <a href="/" className="logo">
+          <a className="logo">
             <i className="bi bi-bell" />
           </a>
 
@@ -117,7 +116,6 @@ function Navbar() {
           onClose={() => setShowCreatePost(false)}
           onPostCreated={() => {
             setShowCreatePost(false);
-            // Optionally refresh the page or update state
             window.location.reload();
           }}
         />

@@ -46,13 +46,11 @@ export const voteComment = async (req, res) => {
     const comment = await Comment.findById(id);
     if (!comment) return res.status(404).json({ error: 'Comment not found' });
 
-    // Convert userId to ObjectId for consistency
     const userObjectId = new mongoose.Types.ObjectId(userId);
     const hasUp = comment.upvoters.some(u => u.toString() === userId);
     const hasDown = comment.downvoters.some(u => u.toString() === userId);
 
     if (delta === 0) {
-      // remove existing vote
       if (hasUp) {
         comment.upvoters = comment.upvoters.filter(u => u.toString() !== userId);
         comment.karma -= 1;
@@ -64,26 +62,24 @@ export const voteComment = async (req, res) => {
       }
     } else if (delta === 1) {
       if (hasUp) {
-        // unvote
         comment.upvoters = comment.upvoters.filter(u => u.toString() !== userId);
         comment.karma -= 1;
       } else {
         if (hasDown) {
           comment.downvoters = comment.downvoters.filter(u => u.toString() !== userId);
-          comment.karma += 1; // remove downvote (+1) then add upvote below (+1)
+          comment.karma += 1;
         }
         comment.upvoters.push(userObjectId);
         comment.karma += 1;
       }
     } else if (delta === -1) {
       if (hasDown) {
-        // unvote
         comment.downvoters = comment.downvoters.filter(u => u.toString() !== userId);
         comment.karma += 1;
       } else {
         if (hasUp) {
           comment.upvoters = comment.upvoters.filter(u => u.toString() !== userId);
-          comment.karma -= 1; // remove upvote (-1) then add downvote below (-1)
+          comment.karma -= 1;
         }
         comment.downvoters.push(userObjectId);
         comment.karma -= 1;

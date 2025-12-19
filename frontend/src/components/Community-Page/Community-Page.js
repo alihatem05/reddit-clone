@@ -25,7 +25,6 @@ function CommunityPage() {
   useEffect(() => {
     if (!id) return;
     
-    // Fetch community data
     fetch(`/api/communities/${id}`)
       .then((res) => res.json())
       .then((data) => {
@@ -35,8 +34,6 @@ function CommunityPage() {
         }
         setCommunity(data);
         
-        // Check if user is a member
-        // Check both community.members and user.communities for compatibility
         if (currentUser) {
           const memberIds = data.members?.map(m => 
             typeof m === 'object' ? m._id : m
@@ -56,7 +53,6 @@ function CommunityPage() {
         setIsLoading(false);
       });
 
-    // Fetch community posts
     fetch(`/api/communities/${id}/posts`)
       .then((res) => res.json())
       .then((data) => {
@@ -86,14 +82,11 @@ function CommunityPage() {
       
       const data = await res.json();
       if (res.ok) {
-        // Update membership state
         setIsMember(!isMember);
         
-        // Update community data with new member count
         if (data.community) {
           setCommunity(data.community);
         } else if (community) {
-          // Fallback: update locally
           setCommunity(prev => {
             const newMembers = isMember 
               ? prev.members.filter(m => {
@@ -109,7 +102,6 @@ function CommunityPage() {
           });
         }
         
-        // Update user's communities in localStorage if available
         if (data.user && data.user.communities) {
           const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
           if (storedUser && storedUser._id === currentUser._id) {
@@ -131,9 +123,7 @@ function CommunityPage() {
 
   const handlePostCreated = (newPost) => {
     setShowCreatePost(false);
-    // Add new post to the list
     setPosts((prevPosts) => [newPost, ...prevPosts]);
-    // Refresh community to update post count
     fetch(`/api/communities/${id}`)
       .then((res) => res.json())
       .then(setCommunity);
@@ -153,9 +143,7 @@ function CommunityPage() {
       const data = await response.json();
       
       if (response.ok) {
-        // Navigate to home page after successful deletion
         navigate("/");
-        // Dispatch event to refresh communities list
         window.dispatchEvent(new Event('communityCreated'));
       } else {
         alert(data.error || "Failed to delete community");
@@ -200,26 +188,23 @@ function CommunityPage() {
 
   return (
     <div id="communityPage">
-      {/* Community Header Banner */}
       <div id="communityBanner"></div>
 
-      {/* Community Content Area */}
-      <div id="communityContent">
-        <div id="communityMain">
-          {/* Header Card Container - Aligned with Main Content */}
-          <div id="communityHeaderCard">
-            <div id="communityHeaderContent">
-              {community.logo && (
-                <img id="communityLogo" src={community.logo} alt={community.name} />
-              )}
-              <div id="communityHeaderInfo">
-                <div id="communityHeaderTop">
-                  <h1 id="communityName">r/{community.name}</h1>
-                </div>
-              </div>
+      <div id="communityHeaderCard">
+        <div id="communityHeaderContent">
+          {community.logo && (
+            <img id="communityLogo" src={community.logo} alt={community.name} />
+          )}
+          <div id="communityHeaderInfo">
+            <div id="communityHeaderTop">
+              <h1 id="communityName">r/{community.name}</h1>
             </div>
           </div>
-          {/* Posts Section */}
+        </div>
+      </div>
+
+      <div id="communityContent">
+        <div id="communityMain">
           <div id="postsSection">
             {posts.length === 0 ? (
               <div id="noPosts">
@@ -251,7 +236,6 @@ function CommunityPage() {
           </div>
         </div>
 
-        {/* Community Sidebar */}
         <div id="communitySidebar">
           <div id="sidebarCard">
             <div id="sidebarHeader">

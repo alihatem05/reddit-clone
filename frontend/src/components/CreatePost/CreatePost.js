@@ -28,7 +28,6 @@ function CreatePost({ onClose, onPostCreated, defaultCommunity = "" }) {
   useEffect(() => {
     fetchCommunities();
     
-    // Listen for new community creation
     const handleCommunityCreated = () => {
       fetchCommunities();
     };
@@ -40,7 +39,6 @@ function CreatePost({ onClose, onPostCreated, defaultCommunity = "" }) {
     };
   }, []);
 
-  // Update community when defaultCommunity prop changes
   useEffect(() => {
     if (defaultCommunity) {
       setFormData(prev => ({ ...prev, community: defaultCommunity }));
@@ -55,7 +53,6 @@ function CreatePost({ onClose, onPostCreated, defaultCommunity = "" }) {
     }));
     setError("");
     
-    // Handle image preview
     if (name === "image" && value.trim()) {
       setImageError(false);
       setImagePreview(value.trim());
@@ -102,7 +99,6 @@ function CreatePost({ onClose, onPostCreated, defaultCommunity = "" }) {
         community: formData.community,
       };
       
-      // Only include image if it's not empty
       const imageUrl = formData.image.trim();
       if (imageUrl) {
         postData.image = imageUrl;
@@ -133,7 +129,6 @@ function CreatePost({ onClose, onPostCreated, defaultCommunity = "" }) {
         return;
       }
 
-      // Success - close modal and refresh posts
       if (onPostCreated) {
         onPostCreated(json);
       }

@@ -35,7 +35,6 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
         avatar: currentAvatar
       });
       setSelectedAvatar(currentAvatar);
-      // Check if avatar is a base64 data URL (custom avatar) or a filename
       if (currentAvatar.startsWith('data:image/')) {
         setAvatarPreview(currentAvatar);
       } else {
@@ -65,13 +64,11 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
   const handleCustomAvatarUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         alert('Please select an image file');
         return;
       }
 
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         alert('Image size should be less than 5MB');
         return;
@@ -82,7 +79,6 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
       reader.onloadend = () => {
         const base64String = reader.result;
         setAvatarPreview(base64String);
-        // Store as base64 data URL for custom avatars
         setFormData(prev => ({ ...prev, avatar: base64String }));
       };
       reader.readAsDataURL(file);
@@ -94,7 +90,6 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
     e.preventDefault();
     setSuccessMessage('');
 
-    // Prepare updates object (only include changed fields)
     const updates = {};
     if (formData.username !== user.username) {
       updates.username = formData.username;
@@ -106,7 +101,6 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
       updates.avatar = formData.avatar;
     }
 
-    // If there are no changes, just close
     if (Object.keys(updates).length === 0) {
       onClose();
       return;
@@ -133,7 +127,6 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="edit-profile-form">
-          {/* Avatar Section */}
           <div className="form-section">
             <label className="form-label">Profile Picture</label>
             <div className="avatar-edit-container">
@@ -178,7 +171,6 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
             </div>
           </div>
 
-          {/* Username */}
           <div className="form-section">
             <label className="form-label" htmlFor="username">Username</label>
             <input
@@ -194,7 +186,6 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
             />
           </div>
 
-          {/* Email */}
           <div className="form-section">
             <label className="form-label" htmlFor="email">Email</label>
             <input
@@ -208,17 +199,14 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
             />
           </div>
 
-          {/* Error Message */}
           {error && (
             <div className="error-message">{error}</div>
           )}
 
-          {/* Success Message */}
           {successMessage && (
             <div className="success-message">{successMessage}</div>
           )}
 
-          {/* Form Actions */}
           <div className="form-actions">
             <button
               type="button"

@@ -26,7 +26,6 @@ export default function Sidebar() {
   const handleCommunityCreated = (newCommunity) => {
     setCommunities((prev) => [newCommunity, ...prev]);
     setShowCreateCommunity(false);
-    // Dispatch event for other components
     window.dispatchEvent(new Event('communityCreated'));
   };
 
@@ -38,7 +37,6 @@ export default function Sidebar() {
       })
       .catch((err) => console.log("Error fetching communities:", err));
     
-    // Listen for new community creation
     const handleCommunityCreated = () => {
       fetch(`/api/communities`)
         .then((response) => response.json())

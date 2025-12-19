@@ -26,12 +26,11 @@
     background-color: #1A1C1E;
     border: 1px solid #3E4142;
     border-radius: 4px;
-    margin: -48px 0 16px 0;
+    margin: -48px 24px 16px 24px;
     padding: 16px;
     position: relative;
     z-index: 10;
     flex-shrink: 0;
-    width: 100%;
     box-sizing: border-box;
 }
 
@@ -75,7 +74,6 @@
     line-height: 1.2;
 }
 
-/* Community Content Area */
 #communityContent {
     display: flex;
     flex-direction: row;
@@ -116,18 +114,15 @@
     color: white;
 }
 
-/* Community Sidebar */
 #communitySidebar {
-    width: 312px;
-    flex-shrink: 0;
-    position: sticky;
-    top: 24px;
-    align-self: flex-start;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 332px;
+    height: 100vh;
 }
 
 #sidebarCard {
-    background-color: #1A1C1E;
-    border: 1px solid #3E4142;
     border-radius: 8px;
     overflow: hidden;
 }
@@ -135,7 +130,6 @@
 #sidebarHeader {
     background-color: #1A1C1E;
     padding: 16px;
-    border-bottom: 1px solid #3E4142;
 }
 
 #sidebarHeader h2 {
