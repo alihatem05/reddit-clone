@@ -94,6 +94,8 @@ function PostPage({ }) {
       } else {
         setPost(prev => ({ ...prev, comments: [...(prev.comments || []), json] }));
       }
+      // Dispatch event to notify profile page
+      window.dispatchEvent(new CustomEvent('commentCreated'));
       return json;
     } catch (err) {
       console.error(err);
@@ -125,6 +127,8 @@ function PostPage({ }) {
         });
       };
       setPost(prev => ({ ...prev, comments: replaceComment(prev.comments || []) }));
+      // Dispatch event to notify profile page
+      window.dispatchEvent(new CustomEvent('commentVoted'));
     } catch (err) {
       console.error(err);
     }
@@ -175,6 +179,8 @@ function PostPage({ }) {
       const updated = await res.json();
       if (!res.ok) return;
       setPost(updated);
+      // Dispatch event to notify profile page
+      window.dispatchEvent(new CustomEvent('postVoted'));
     } catch (err) {
       console.error(err);
     }

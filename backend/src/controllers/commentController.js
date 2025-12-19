@@ -1,5 +1,7 @@
 import Comment from "../models/Comment.js";
 import Post from "../models/Post.js";
+import User from "../models/User.js";
+import mongoose from "mongoose";
 
 export const getComments = async (req, res) => {
   try {
@@ -14,8 +16,14 @@ export const getComments = async (req, res) => {
 
 export const addComment = async (req, res) => {
   try {
-    const { parent, post: postId } = req.body;
+    const { parent, post: postId, user: userId } = req.body;
     const newComment = await Comment.create(req.body);
+    
+    // Add comment reference to user's comments array
+    if (userId) {
+      await User.findByIdAndUpdate(userId, { $push: { comments: newComment._id } });
+    }
+    
     if (newComment.post && !parent) {
       await Post.findByIdAndUpdate(newComment.post, { $push: { comments: newComment._id } });
     }
@@ -38,6 +46,8 @@ export const voteComment = async (req, res) => {
     const comment = await Comment.findById(id);
     if (!comment) return res.status(404).json({ error: 'Comment not found' });
 
+    // Convert userId to ObjectId for consistency
+    const userObjectId = new mongoose.Types.ObjectId(userId);
     const hasUp = comment.upvoters.some(u => u.toString() === userId);
     const hasDown = comment.downvoters.some(u => u.toString() === userId);
 
@@ -62,7 +72,7 @@ export const voteComment = async (req, res) => {
           comment.downvoters = comment.downvoters.filter(u => u.toString() !== userId);
           comment.karma += 1; // remove downvote (+1) then add upvote below (+1)
         }
-        comment.upvoters.push(userId);
+        comment.upvoters.push(userObjectId);
         comment.karma += 1;
       }
     } else if (delta === -1) {
@@ -75,7 +85,7 @@ export const voteComment = async (req, res) => {
           comment.upvoters = comment.upvoters.filter(u => u.toString() !== userId);
           comment.karma -= 1; // remove upvote (-1) then add downvote below (-1)
         }
-        comment.downvoters.push(userId);
+        comment.downvoters.push(userObjectId);
         comment.karma -= 1;
       }
     }

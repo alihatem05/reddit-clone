@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import Post from "../models/Post.js";
+import Comment from "../models/Comment.js";
 import jwt from "jsonwebtoken";
 import validator from "validator";
 import mongoose from "mongoose";
@@ -24,10 +25,111 @@ export const getUser = async (req, res) => {
 
     const posts = await Post.find({ user: req.params.id })
       .populate('user')
-      .populate('community');
+      .populate('community')
+      .sort({ createdAt: -1 });
+
+    const comments = await Comment.find({ user: req.params.id })
+      .populate('user')
+      .populate('post')
+      .populate({
+        path: 'post',
+        populate: [
+          { path: 'user' },
+          { path: 'community' }
+        ]
+      })
+      .populate({
+        path: 'replies',
+        populate: { path: 'user', select: 'username avatar' }
+      })
+      .sort({ createdAt: -1 });
+
+    const upvotedPosts = await Post.find({ upvoters: req.params.id })
+      .populate('user')
+      .populate('community')
+      .sort({ createdAt: -1 });
+
+    const downvotedPosts = await Post.find({ downvoters: req.params.id })
+      .populate('user')
+      .populate('community')
+      .sort({ createdAt: -1 });
+
+    const upvotedComments = await Comment.find({ upvoters: req.params.id })
+      .populate('user')
+      .populate('post')
+      .populate({
+        path: 'post',
+        populate: [
+          { path: 'user' },
+          { path: 'community' }
+        ]
+      })
+      .populate({
+        path: 'replies',
+        populate: { path: 'user', select: 'username avatar' }
+      })
+      .sort({ createdAt: -1 });
+
+    const downvotedComments = await Comment.find({ downvoters: req.params.id })
+      .populate('user')
+      .populate('post')
+      .populate({
+        path: 'post',
+        populate: [
+          { path: 'user' },
+          { path: 'community' }
+        ]
+      })
+      .populate({
+        path: 'replies',
+        populate: { path: 'user', select: 'username avatar' }
+      })
+      .sort({ createdAt: -1 });
 
     user.posts = posts;
+    user.comments = comments;
+    user.upvotedPosts = upvotedPosts;
+    user.downvotedPosts = downvotedPosts;
+    user.upvotedComments = upvotedComments;
+    user.downvotedComments = downvotedComments;
     res.json(user);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+export const getUserComments = async (req, res) => {
+  try {
+    const comments = await Comment.find({ user: req.params.id })
+      .populate('user', 'username avatar')
+      .populate('post', 'title _id')
+      .populate({ path: 'replies', populate: { path: 'user', select: 'username avatar' } })
+      .sort({ createdAt: -1 });
+    res.json(comments);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+export const getUserUpvotedPosts = async (req, res) => {
+  try {
+    const posts = await Post.find({ upvoters: req.params.id })
+      .populate('user', 'username avatar')
+      .populate('community', 'name logo')
+      .sort({ createdAt: -1 });
+    res.json(posts);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+export const getUserDownvotedPosts = async (req, res) => {
+  try {
+    const posts = await Post.find({ downvoters: req.params.id })
+      .populate('user', 'username avatar')
+      .populate('community', 'name logo')
+      .sort({ createdAt: -1 });
+    res.json(posts);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

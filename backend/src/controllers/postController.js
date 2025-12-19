@@ -1,6 +1,7 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
 import Comment from "../models/Comment.js";
+import mongoose from "mongoose";
 
 export const getPosts = async (req, res) => {
   try {
@@ -78,6 +79,8 @@ export const votePost = async (req, res) => {
     const post = await Post.findById(id);
     if (!post) return res.status(404).json({ error: 'Post not found' });
 
+    // Convert userId to ObjectId for consistency
+    const userObjectId = new mongoose.Types.ObjectId(userId);
     const hasUp = post.upvoters.some(u => u.toString() === userId);
     const hasDown = post.downvoters.some(u => u.toString() === userId);
 
@@ -101,7 +104,7 @@ export const votePost = async (req, res) => {
           post.downvoters = post.downvoters.filter(u => u.toString() !== userId);
           post.votes += 1; // remove downvote then add upvote
         }
-        post.upvoters.push(userId);
+        post.upvoters.push(userObjectId);
         post.votes += 1;
       }
     } else if (delta === -1) {
@@ -113,7 +116,7 @@ export const votePost = async (req, res) => {
           post.upvoters = post.upvoters.filter(u => u.toString() !== userId);
           post.votes -= 1; // remove upvote (-1) then add downvote (-1)
         }
-        post.downvoters.push(userId);
+        post.downvoters.push(userObjectId);
         post.votes -= 1;
       }
     }

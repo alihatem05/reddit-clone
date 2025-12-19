@@ -93,6 +93,8 @@ function Post({ post, user, community, onClick, readOnly = false }) {
       const updated = await res.json();
       // Optionally, if parent provides a callback, we could notify parent of changes
       setLocalPost(updated);
+      // Dispatch event to notify profile page
+      window.dispatchEvent(new CustomEvent('postVoted'));
     } catch (err) {
       console.error(err);
     }

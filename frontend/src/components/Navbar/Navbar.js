@@ -3,12 +3,14 @@ import "./Navbar.css";
 import reddit_logo_path from "./../../assets/Reddit-Logo.png";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "./../../hooks/useAuthContext";
-import { useLogout } from "./../../hooks/useLogout"
+import { useLogout } from "./../../hooks/useLogout";
+import CreatePost from "../CreatePost/CreatePost";
 
 function Navbar() {
   const [communities, setCommunities] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showCreatePost, setShowCreatePost] = useState(false);
   const { user }  = useAuthContext()
   const { logout } = useLogout()
 
@@ -85,7 +87,16 @@ function Navbar() {
           <a href="/" className="logo">
             <i className="bi bi-chat-dots" />
           </a>
-          <a href="/" className="logo">
+          <a 
+            href="/" 
+            className="logo"
+            onClick={(e) => {
+              e.preventDefault();
+              if (user) {
+                setShowCreatePost(true);
+              }
+            }}
+          >
             <i className="bi bi-plus-square" />
           </a>
           <a href="/" className="logo">
@@ -101,6 +112,16 @@ function Navbar() {
           </div>
         </div>
       </nav>
+      {showCreatePost && (
+        <CreatePost
+          onClose={() => setShowCreatePost(false)}
+          onPostCreated={() => {
+            setShowCreatePost(false);
+            // Optionally refresh the page or update state
+            window.location.reload();
+          }}
+        />
+      )}
     </>
   );
 }

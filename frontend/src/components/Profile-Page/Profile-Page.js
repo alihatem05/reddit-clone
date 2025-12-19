@@ -1,9 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useAuthContext } from "../../hooks/useAuthContext";
 import "./Profile-Page.css";
 import useDisplayPost from '../../hooks/useDisplayPost';
 import Post from '../Post/Post';
 import EditProfileModal from './EditProfileModal';
+import CreatePost from '../CreatePost/CreatePost';
+import Comment from '../Comment/Comment';
 
 const tabs = ["Posts", "Comments", "Upvoted", "Downvoted"];
 
@@ -30,16 +32,60 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("Posts");
   const tabsRef = useRef(null);
   const [posts, setPosts] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [upvotedPosts, setUpvotedPosts] = useState([]);
+  const [downvotedPosts, setDownvotedPosts] = useState([]);
+  const [upvotedComments, setUpvotedComments] = useState([]);
+  const [downvotedComments, setDownvotedComments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const displayPost = useDisplayPost();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [showCreatePost, setShowCreatePost] = useState(false);
 
-  useEffect(() => {
+  const fetchUserData = useCallback(() => {
     if (!user || !user._id) return;
+    setIsLoading(true);
+    
     fetch(`/api/users/${user._id}`)
       .then((res) => res.json())
-      .then((data) => setPosts(data.posts || []))
-      .catch(console.log);
+      .then((data) => {
+        setPosts(data.posts || []);
+        setComments(data.comments || []);
+        setUpvotedPosts(data.upvotedPosts || []);
+        setDownvotedPosts(data.downvotedPosts || []);
+        setUpvotedComments(data.upvotedComments || []);
+        setDownvotedComments(data.downvotedComments || []);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching user data:", err);
+        setIsLoading(false);
+      });
   }, [user]);
+
+  useEffect(() => {
+    fetchUserData();
+    
+    // Listen for vote events to refresh profile data
+    const handleVoteEvent = () => {
+      fetchUserData();
+    };
+    
+    // Listen for comment creation events
+    const handleCommentCreated = () => {
+      fetchUserData();
+    };
+    
+    window.addEventListener('postVoted', handleVoteEvent);
+    window.addEventListener('commentVoted', handleVoteEvent);
+    window.addEventListener('commentCreated', handleCommentCreated);
+    
+    return () => {
+      window.removeEventListener('postVoted', handleVoteEvent);
+      window.removeEventListener('commentVoted', handleVoteEvent);
+      window.removeEventListener('commentCreated', handleCommentCreated);
+    };
+  }, [user, fetchUserData]);
 
   if (!user) {
     return <p style={{ textAlign: "center", marginTop: "50px" }}>Loading user data...</p>;
@@ -139,7 +185,7 @@ const ProfilePage = () => {
           <div className="tab-content">
             {activeTab === "Posts" && (
               <div className="tab-section">
-                <button className="postButtonProf">Create Post</button>
+                <button className="postButtonProf" onClick={() => setShowCreatePost(true)}>Create Post</button>
                 {posts.length === 0 ? (
                   <EmptyState title={emptyMessages.Posts} />
                 ) : (
@@ -155,8 +201,157 @@ const ProfilePage = () => {
               </div>
             )}
 
-            {["Comments", "Upvoted", "Downvoted"].includes(activeTab) && (
-              <EmptyState title={emptyMessages[activeTab]} />
+            {activeTab === "Comments" && (
+              <div className="tab-section">
+                {isLoading ? (
+                  <p style={{ color: "white", textAlign: "center", marginTop: "50px" }}>Loading comments...</p>
+                ) : !Array.isArray(comments) || comments.length === 0 ? (
+                  <EmptyState title={emptyMessages.Comments} />
+                ) : (
+                  <div className="user-comments-list">
+                    {comments
+                      .filter(comment => comment && comment._id)
+                      .map((comment) => {
+                        if (!comment || !comment._id) return null;
+                        const postId = typeof comment.post === 'object' ? comment.post?._id : comment.post;
+                        const postTitle = typeof comment.post === 'object' ? comment.post?.title : null;
+                        return (
+                          <div key={comment._id} className="profile-comment-item" style={{ marginBottom: '12px' }}>
+                            <div className="profile-comment-header">
+                              <span 
+                                className="profile-comment-post-title" 
+                                onClick={() => postId && displayPost(postId)}
+                                style={{ cursor: postId ? 'pointer' : 'default', color: '#D93900', fontWeight: '600' }}
+                              >
+                                {postTitle || "Post deleted"}
+                              </span>
+                              <span className="profile-comment-time" style={{ color: '#888', fontSize: '12px' }}>
+                                {comment.createdAt ? new Date(comment.createdAt).toLocaleDateString() : ''}
+                              </span>
+                            </div>
+                            <Comment 
+                              comment={comment} 
+                              onReply={() => {}} 
+                              onVote={() => {
+                                fetchUserData();
+                              }} 
+                              onDelete={() => {
+                                fetchUserData();
+                              }} 
+                            />
+                            <div style={{ height: "1px", width: "100%", backgroundColor: "#3E4142", marginTop: "15px", marginBottom: "15px"}} />
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "Upvoted" && (
+              <div className="tab-section">
+                {isLoading ? (
+                  <p style={{ color: "white", textAlign: "center", marginTop: "50px" }}>Loading...</p>
+                ) : (upvotedPosts.length === 0 && upvotedComments.length === 0) ? (
+                  <EmptyState title={emptyMessages.Upvoted} />
+                ) : (
+                  <div className="user-posts-list">
+                    {upvotedPosts.map((p) => (
+                      <div key={`post-${p._id}`} style={{ marginBottom: '12px' }}>
+                        <div style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>POST</div>
+                        <Post post={p} user={p.user} community={p.community} readOnly={true} onClick={() => displayPost(p._id)} />
+                        <div style={{ height: "1px", width: "590px", backgroundColor: "#3E4142", marginTop: "15px", marginBottom: "15px"}} />
+                      </div>
+                    ))}
+                    {upvotedComments
+                      .filter(comment => comment && comment._id)
+                      .map((comment) => {
+                        if (!comment || !comment._id) return null;
+                        const postId = typeof comment.post === 'object' ? comment.post?._id : comment.post;
+                        const postTitle = typeof comment.post === 'object' ? comment.post?.title : null;
+                        return (
+                          <div key={`comment-${comment._id}`} className="profile-comment-item" style={{ marginBottom: '12px' }}>
+                            <div style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>COMMENT</div>
+                            <div className="profile-comment-header">
+                              <span 
+                                className="profile-comment-post-title" 
+                                onClick={() => postId && displayPost(postId)}
+                                style={{ cursor: postId ? 'pointer' : 'default', color: '#D93900', fontWeight: '600' }}
+                              >
+                                {postTitle || "Post deleted"}
+                              </span>
+                              <span className="profile-comment-time" style={{ color: '#888', fontSize: '12px' }}>
+                                {comment.createdAt ? new Date(comment.createdAt).toLocaleDateString() : ''}
+                              </span>
+                            </div>
+                            <Comment 
+                              comment={comment} 
+                              onReply={() => {}} 
+                              onVote={() => {
+                                fetchUserData();
+                              }} 
+                              onDelete={() => {}} 
+                            />
+                            <div style={{ height: "1px", width: "100%", backgroundColor: "#3E4142", marginTop: "15px", marginBottom: "15px"}} />
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "Downvoted" && (
+              <div className="tab-section">
+                {isLoading ? (
+                  <p style={{ color: "white", textAlign: "center", marginTop: "50px" }}>Loading...</p>
+                ) : (downvotedPosts.length === 0 && downvotedComments.length === 0) ? (
+                  <EmptyState title={emptyMessages.Downvoted} />
+                ) : (
+                  <div className="user-posts-list">
+                    {downvotedPosts.map((p) => (
+                      <div key={`post-${p._id}`} style={{ marginBottom: '12px' }}>
+                        <div style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>POST</div>
+                        <Post post={p} user={p.user} community={p.community} readOnly={true} onClick={() => displayPost(p._id)} />
+                        <div style={{ height: "1px", width: "590px", backgroundColor: "#3E4142", marginTop: "15px", marginBottom: "15px"}} />
+                      </div>
+                    ))}
+                    {downvotedComments
+                      .filter(comment => comment && comment._id)
+                      .map((comment) => {
+                        if (!comment || !comment._id) return null;
+                        const postId = typeof comment.post === 'object' ? comment.post?._id : comment.post;
+                        const postTitle = typeof comment.post === 'object' ? comment.post?.title : null;
+                        return (
+                          <div key={`comment-${comment._id}`} className="profile-comment-item" style={{ marginBottom: '12px' }}>
+                            <div style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>COMMENT</div>
+                            <div className="profile-comment-header">
+                              <span 
+                                className="profile-comment-post-title" 
+                                onClick={() => postId && displayPost(postId)}
+                                style={{ cursor: postId ? 'pointer' : 'default', color: '#D93900', fontWeight: '600' }}
+                              >
+                                {postTitle || "Post deleted"}
+                              </span>
+                              <span className="profile-comment-time" style={{ color: '#888', fontSize: '12px' }}>
+                                {comment.createdAt ? new Date(comment.createdAt).toLocaleDateString() : ''}
+                              </span>
+                            </div>
+                            <Comment 
+                              comment={comment} 
+                              onReply={() => {}} 
+                              onVote={() => {
+                                fetchUserData();
+                              }} 
+                              onDelete={() => {}} 
+                            />
+                            <div style={{ height: "1px", width: "100%", backgroundColor: "#3E4142", marginTop: "15px", marginBottom: "15px"}} />
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -166,6 +361,15 @@ const ProfilePage = () => {
         onClose={() => setIsEditModalOpen(false)}
         user={user}
       />
+      {showCreatePost && (
+        <CreatePost
+          onClose={() => setShowCreatePost(false)}
+          onPostCreated={(newPost) => {
+            setShowCreatePost(false);
+            setPosts((prevPosts) => [newPost, ...prevPosts]);
+          }}
+        />
+      )}
     </div>
   );
 };
