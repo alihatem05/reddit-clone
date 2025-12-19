@@ -8,16 +8,13 @@ function CreateCommunity({ onClose, onCommunityCreated }) {
   const [formData, setFormData] = useState({
     topic: "",
     type: "public",
-    logo: "",
     name: "",
     description: "",
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [logoPreview, setLogoPreview] = useState(null);
-  const [logoError, setLogoError] = useState(false);
 
-  const totalSteps = 5;
+  const totalSteps = 4;
 
   const topics = [
     { value: "anime-cosplay", label: "Anime & Cosplay", color: "#FF4500", icon: "🎭" },
@@ -90,15 +87,6 @@ function CreateCommunity({ onClose, onCommunityCreated }) {
       [name]: value,
     }));
     setError("");
-    
-    // Handle logo preview
-    if (name === "logo" && value.trim()) {
-      setLogoError(false);
-      setLogoPreview(value.trim());
-    } else if (name === "logo" && !value.trim()) {
-      setLogoPreview(null);
-      setLogoError(false);
-    }
   };
 
   const handleTypeSelect = (type) => {
@@ -115,26 +103,15 @@ function CreateCommunity({ onClose, onCommunityCreated }) {
     }));
   };
 
-  const handleLogoError = () => {
-    setLogoError(true);
-  };
-
-  const handleLogoLoad = () => {
-    setLogoError(false);
-  };
-
   const handleNext = () => {
     if (currentStep === 1) {
-      // Step 1: Topic selection - optional, can skip
+      // Step 1: Category selection - optional, can skip
       setCurrentStep(2);
     } else if (currentStep === 2) {
       // Step 2: Type selection - always valid
       setCurrentStep(3);
     } else if (currentStep === 3) {
-      // Step 3: Logo - optional, can skip
-      setCurrentStep(4);
-    } else if (currentStep === 4) {
-      // Step 4: Name - validate before proceeding
+      // Step 3: Name - validate before proceeding
       if (!formData.name.trim()) {
         setError("Community name is required");
         return;
@@ -145,7 +122,7 @@ function CreateCommunity({ onClose, onCommunityCreated }) {
         return;
       }
       setError("");
-      setCurrentStep(5);
+      setCurrentStep(4);
     }
   };
 
@@ -185,11 +162,6 @@ function CreateCommunity({ onClose, onCommunityCreated }) {
         type: formData.type,
         createdBy: user._id,
       };
-      
-      const logoUrl = formData.logo.trim();
-      if (logoUrl) {
-        communityData.logo = logoUrl;
-      }
 
       const topic = formData.topic.trim();
       if (topic) {
@@ -296,60 +268,6 @@ function CreateCommunity({ onClose, onCommunityCreated }) {
       case 3:
         return (
           <div className="step-content">
-            <h3 className="step-title">Add a logo (optional)</h3>
-            <p className="step-description">
-              Add an image to represent your community. This will be shown next to your community name.
-            </p>
-            <div className="form-group">
-              <label htmlFor="logo">Logo URL</label>
-              <input
-                id="logo"
-                name="logo"
-                type="text"
-                value={formData.logo}
-                onChange={handleChange}
-                placeholder="Enter logo image URL"
-              />
-              {logoPreview && (
-                <div className="logo-preview-container">
-                  {logoError ? (
-                    <div className="logo-preview-error">
-                      <p>Unable to load logo preview</p>
-                      <small>The logo may still work when created, but preview failed to load.</small>
-                    </div>
-                  ) : (
-                    <img 
-                      src={logoPreview} 
-                      alt="Logo Preview" 
-                      className="logo-preview"
-                      onError={handleLogoError}
-                      onLoad={handleLogoLoad}
-                      crossOrigin="anonymous"
-                    />
-                  )}
-                  <button 
-                    type="button" 
-                    className="remove-logo-btn"
-                    onClick={() => {
-                      setFormData(prev => ({ ...prev, logo: "" }));
-                      setLogoPreview(null);
-                      setLogoError(false);
-                    }}
-                  >
-                    Remove Logo
-                  </button>
-                </div>
-              )}
-              <small style={{ color: '#80A2Aa', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                Enter any logo image URL. The logo will be displayed for your community.
-              </small>
-            </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="step-content">
             <h3 className="step-title">Name your community</h3>
             <p className="step-description">
               Community names must be 3-21 characters and contain only letters, numbers, and underscores.
@@ -375,7 +293,7 @@ function CreateCommunity({ onClose, onCommunityCreated }) {
           </div>
         );
 
-      case 5:
+      case 4:
         return (
           <div className="step-content">
             <h3 className="step-title">Describe your community</h3>
@@ -419,7 +337,7 @@ function CreateCommunity({ onClose, onCommunityCreated }) {
             ></div>
           </div>
           <div className="step-numbers">
-            {[1, 2, 3, 4, 5].map((step) => (
+            {[1, 2, 3, 4].map((step) => (
               <div
                 key={step}
                 className={`step-number ${currentStep >= step ? "active" : ""} ${currentStep === step ? "current" : ""}`}
@@ -430,7 +348,7 @@ function CreateCommunity({ onClose, onCommunityCreated }) {
           </div>
         </div>
 
-        <form onSubmit={currentStep === 5 ? handleSubmit : (e) => { e.preventDefault(); handleNext(); }} className="create-community-form">
+        <form onSubmit={currentStep === 4 ? handleSubmit : (e) => { e.preventDefault(); handleNext(); }} className="create-community-form">
           {renderStepContent()}
 
           {error && <div className="error-message">{error}</div>}
@@ -460,7 +378,7 @@ function CreateCommunity({ onClose, onCommunityCreated }) {
                 className="submit-btn"
                 disabled={isLoading}
               >
-                {isLoading ? "Creating..." : currentStep === 5 ? "Create Community" : "Next"}
+                {isLoading ? "Creating..." : currentStep === 4 ? "Create Community" : "Next"}
               </button>
             </div>
           </div>

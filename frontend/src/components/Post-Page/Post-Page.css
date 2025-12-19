@@ -61,6 +61,15 @@
     padding: 0px;
 }
 
+#subredditD:hover {
+    text-decoration: underline;
+    color: #d7dadc;
+}
+
+#subLogoDetailed:hover {
+    opacity: 0.8;
+}
+
 #userD {
     margin-top: 0px;
     padding: 0px;

@@ -9,18 +9,22 @@ import CreatePost from "../CreatePost/CreatePost";
 function CommunityPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuthContext();
+  const { user: currentUser } = useAuthContext();
   const displayPost = useDisplayPost();
+  
   const [community, setCommunity] = useState(null);
   const [posts, setPosts] = useState([]);
   const [isMember, setIsMember] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState(null);
   const [showCreatePost, setShowCreatePost] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (!id) return;
-
+    
     // Fetch community data
     fetch(`/api/communities/${id}`)
       .then((res) => res.json())
@@ -30,17 +34,26 @@ function CommunityPage() {
           return;
         }
         setCommunity(data);
+        
         // Check if user is a member
-        if (user && data.members) {
-          const memberIds = data.members.map(m => 
+        // Check both community.members and user.communities for compatibility
+        if (currentUser) {
+          const memberIds = data.members?.map(m => 
             typeof m === 'object' ? m._id : m
+          ) || [];
+          const userCommunityIds = currentUser.communities?.map(c =>
+            typeof c === 'object' ? c._id : c
+          ) || [];
+          setIsMember(
+            memberIds.includes(currentUser._id) || 
+            userCommunityIds.includes(data._id)
           );
-          setIsMember(memberIds.includes(user._id));
         }
       })
       .catch((err) => {
+        console.error("Error fetching community:", err);
         setError("Failed to load community");
-        console.error(err);
+        setIsLoading(false);
       });
 
     // Fetch community posts
@@ -51,32 +64,68 @@ function CommunityPage() {
         setIsLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to fetch posts:", err);
+        console.error("Error fetching posts:", err);
         setIsLoading(false);
       });
-  }, [id, user]);
+  }, [id, currentUser]);
 
   const handleJoinLeave = async () => {
-    if (!user || !user._id) return;
-
+    if (!currentUser || isJoining) return;
+    
+    setIsJoining(true);
+    const endpoint = isMember 
+      ? `/api/communities/${id}/leave`
+      : `/api/communities/${id}/join`;
+    
     try {
-      const endpoint = isMember ? "leave" : "join";
-      const response = await fetch(`/api/communities/${id}/${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user._id }),
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUser._id }),
       });
-
-      const data = await response.json();
-      if (response.ok) {
+      
+      const data = await res.json();
+      if (res.ok) {
+        // Update membership state
         setIsMember(!isMember);
-        // Refresh community data
-        fetch(`/api/communities/${id}`)
-          .then((res) => res.json())
-          .then(setCommunity);
+        
+        // Update community data with new member count
+        if (data.community) {
+          setCommunity(data.community);
+        } else if (community) {
+          // Fallback: update locally
+          setCommunity(prev => {
+            const newMembers = isMember 
+              ? prev.members.filter(m => {
+                  const memberId = typeof m === 'object' ? m._id : m;
+                  return String(memberId) !== String(currentUser._id);
+                })
+              : [...(prev.members || []), currentUser._id];
+            
+            return {
+              ...prev,
+              members: newMembers
+            };
+          });
+        }
+        
+        // Update user's communities in localStorage if available
+        if (data.user && data.user.communities) {
+          const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+          if (storedUser && storedUser._id === currentUser._id) {
+            storedUser.communities = data.user.communities;
+            localStorage.setItem('user', JSON.stringify(storedUser));
+          }
+        }
+      } else {
+        console.error("Failed to join/leave community:", data.error || "Unknown error");
+        alert(data.error || "Failed to " + (isMember ? "leave" : "join") + " community");
       }
     } catch (err) {
-      console.error("Failed to join/leave community:", err);
+      console.error("Error joining/leaving community:", err);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setIsJoining(false);
     }
   };
 
@@ -90,14 +139,56 @@ function CommunityPage() {
       .then(setCommunity);
   };
 
+  const handleDeleteCommunity = async () => {
+    if (!currentUser || !community) return;
+    
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/communities/${id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser._id }),
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        // Navigate to home page after successful deletion
+        navigate("/");
+        // Dispatch event to refresh communities list
+        window.dispatchEvent(new Event('communityCreated'));
+      } else {
+        alert(data.error || "Failed to delete community");
+        setIsDeleting(false);
+        setShowDeleteConfirm(false);
+      }
+    } catch (err) {
+      console.error("Error deleting community:", err);
+      alert("An error occurred while deleting the community");
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  const isCreator = currentUser && community && community.createdBy && 
+    (typeof community.createdBy === 'object' 
+      ? community.createdBy._id.toString() === currentUser._id.toString()
+      : community.createdBy.toString() === currentUser._id.toString());
+
   if (isLoading) {
-    return <div style={{ color: "white", textAlign: "center", marginTop: "50px" }}>Loading...</div>;
+    return (
+      <div id="communityPage">
+        <p style={{ color: "white", marginTop: "100px" }}>Loading...</p>
+      </div>
+    );
   }
 
   if (error || !community) {
     return (
-      <div style={{ color: "white", textAlign: "center", marginTop: "50px" }}>
-        <p>{error || "Community not found"}</p>
+      <div id="communityPage">
+        <p style={{ color: "white", marginTop: "100px" }}>
+          {error || "Community not found"}
+        </p>
         <button onClick={() => navigate(-1)} style={{ marginTop: "20px", padding: "10px 20px" }}>
           Go Back
         </button>
@@ -105,79 +196,116 @@ function CommunityPage() {
     );
   }
 
-  const memberCount = community.members ? community.members.length : 0;
-  const postCount = posts.length;
+  const memberCount = community.members?.length || 0;
 
   return (
-    <div className="community-page">
-      <div className="community-header">
-        <div className="community-info">
-          {community.logo && (
-            <img src={community.logo} alt={community.name} className="community-logo" />
-          )}
-          <div className="community-details">
-            <h1>r/{community.name}</h1>
-            {community.description && <p className="community-description">{community.description}</p>}
-            <div className="community-stats">
-              <span>{memberCount} {memberCount === 1 ? "member" : "members"}</span>
-              <span>•</span>
-              <span>{postCount} {postCount === 1 ? "post" : "posts"}</span>
+    <div id="communityPage">
+      {/* Community Header Banner */}
+      <div id="communityBanner"></div>
+
+      {/* Community Content Area */}
+      <div id="communityContent">
+        <div id="communityMain">
+          {/* Header Card Container - Aligned with Main Content */}
+          <div id="communityHeaderCard">
+            <div id="communityHeaderContent">
+              {community.logo && (
+                <img id="communityLogo" src={community.logo} alt={community.name} />
+              )}
+              <div id="communityHeaderInfo">
+                <div id="communityHeaderTop">
+                  <h1 id="communityName">r/{community.name}</h1>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="community-actions">
-          {user && (
-            <>
-              <button
-                className={isMember ? "leave-btn" : "join-btn"}
-                onClick={handleJoinLeave}
-              >
-                {isMember ? "Leave" : "Join"}
-              </button>
-              <button
-                className="create-post-btn"
-                onClick={() => setShowCreatePost(true)}
-              >
-                Create Post
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-
-      <div className="community-posts">
-        {posts.length === 0 ? (
-          <div className="empty-community">
-            <p>No posts yet in this community.</p>
-            {user && isMember && (
-              <button
-                className="create-first-post-btn"
-                onClick={() => setShowCreatePost(true)}
-              >
-                Create the first post
-              </button>
+          {/* Posts Section */}
+          <div id="postsSection">
+            {posts.length === 0 ? (
+              <div id="noPosts">
+                <p>No posts in this community yet.</p>
+                <p style={{ color: "#7a7a7a", fontSize: "14px", marginTop: "10px" }}>
+                  Be the first to post!
+                </p>
+                {currentUser && isMember && (
+                  <button
+                    className="create-first-post-btn"
+                    onClick={() => setShowCreatePost(true)}
+                    style={{ marginTop: "20px", padding: "12px 24px", borderRadius: "24px", border: "none", fontSize: "14px", fontWeight: "600", cursor: "pointer", backgroundColor: "#D93900", color: "#e6e6e6" }}
+                  >
+                    Create the first post
+                  </button>
+                )}
+              </div>
+            ) : (
+              posts.map((p) => (
+                <Post
+                  key={p._id}
+                  user={p.user}
+                  community={p.community}
+                  post={p}
+                  onClick={() => displayPost(p._id)}
+                />
+              ))
             )}
           </div>
-        ) : (
-          posts.map((post) => (
-            <div key={post._id} style={{ marginBottom: "20px" }}>
-              <Post
-                post={post}
-                user={post.user}
-                community={post.community}
-                onClick={() => displayPost(post._id)}
-              />
-              <div
-                style={{
-                  height: "1px",
-                  width: "100%",
-                  backgroundColor: "#3E4142",
-                  marginTop: "15px",
-                }}
-              />
+        </div>
+
+        {/* Community Sidebar */}
+        <div id="communitySidebar">
+          <div id="sidebarCard">
+            <div id="sidebarHeader">
+              <h2>About Community</h2>
             </div>
-          ))
-        )}
+            <div id="sidebarContent">
+              <div id="memberCount">
+                <div id="memberCountTop">
+                  <span id="memberNumber">{memberCount}</span>
+                  <span id="memberLabel">Members</span>
+                </div>
+              </div>
+              {community.description && (
+                <div id="sidebarDescription">
+                  <p>{community.description}</p>
+                </div>
+              )}
+              <div id="sidebarActions">
+                {!isCreator && (
+                  <button 
+                    id="joinLeaveButton"
+                    className={isMember ? "leave" : "join"}
+                    onClick={handleJoinLeave}
+                    disabled={isJoining || !currentUser}
+                  >
+                    {isJoining ? "Loading..." : (isMember ? "Joined" : "Join")}
+                  </button>
+                )}
+                {currentUser && (
+                  <button
+                    className="create-post-btn"
+                    onClick={() => setShowCreatePost(true)}
+                    style={{ width: "100%", marginTop: "12px", padding: "8px 16px", fontSize: "14px", fontWeight: "700", borderRadius: "9999px", border: "none", cursor: "pointer", backgroundColor: "#D93900", color: "#e6e6e6", transition: "background-color 0.2s" }}
+                  >
+                    Create Post
+                  </button>
+                )}
+                {isCreator && (
+                  <button
+                    className="delete-community-btn"
+                    onClick={() => setShowDeleteConfirm(true)}
+                    disabled={isDeleting}
+                    style={{ width: "100%", marginTop: "12px", padding: "8px 16px", fontSize: "14px", fontWeight: "700", borderRadius: "9999px", border: "1px solid #ff4444", cursor: "pointer", backgroundColor: "transparent", color: "#ff4444", transition: "all 0.2s" }}
+                  >
+                    {isDeleting ? "Deleting..." : "Delete Community"}
+                  </button>
+                )}
+              </div>
+              <div id="communityCreated">
+                <p>Created {new Date(community.createdAt).toLocaleDateString()}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {showCreatePost && (
@@ -187,9 +315,33 @@ function CommunityPage() {
           defaultCommunity={id}
         />
       )}
+
+      {showDeleteConfirm && (
+        <div className="delete-confirm-overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="delete-confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Delete Community</h3>
+            <p>Are you sure you want to delete this community? This action cannot be undone. All posts in this community will be deleted.</p>
+            <div className="delete-confirm-actions">
+              <button
+                className="cancel-delete-btn"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                className="confirm-delete-btn"
+                onClick={handleDeleteCommunity}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 export default CommunityPage;
-

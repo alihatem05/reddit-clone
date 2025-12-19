@@ -5,7 +5,8 @@ import {
   getCommunityById,
   joinCommunity,
   leaveCommunity,
-  getCommunityPosts
+  getCommunityPosts,
+  deleteCommunity
 } from "../controllers/communityController.js";
 
 const router = express.Router();
@@ -27,5 +28,8 @@ router.post("/:id/leave", leaveCommunity);
 
 // GET posts of a community
 router.get("/:id/posts", getCommunityPosts);
+
+// DELETE a community
+router.delete("/:id", deleteCommunity);
 
 export default router;
