@@ -11,7 +11,7 @@ export const useUpdateProfile = () => {
         setError(null)
 
         try {
-            const response = await fetch(`/api/users/${userId}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${userId}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(updates)

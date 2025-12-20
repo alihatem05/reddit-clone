@@ -59,7 +59,7 @@ function PostPage({ }) {
   const handleDeleteComment = async (commentId) => {
     if (!currentUser?._id) return;
     try {
-      const res = await fetch(`/api/comments/${commentId}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/comments/${commentId}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: currentUser._id }),
@@ -77,7 +77,7 @@ function PostPage({ }) {
     if (!text || !text.trim()) return null;
     setIsSubmittingComment(true);
     try {
-      const response = await fetch(`/api/comments`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, user: currentUser?._id || null, post: post._id, parent: parentId }),
@@ -104,7 +104,7 @@ function PostPage({ }) {
 
   const handleVoteComment = async (commentId, delta) => {
     try {
-      const res = await fetch(`/api/comments/${commentId}/vote`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/comments/${commentId}/vote`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ delta, userId: currentUser?._id || null }),
@@ -132,7 +132,7 @@ function PostPage({ }) {
   const handleDeletePost = async () => {
     if (!currentUser?._id) return;
     try {
-      const res = await fetch(`/api/posts/${post._id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/posts/${post._id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: currentUser._id }),
@@ -158,7 +158,7 @@ function PostPage({ }) {
     console.log("PostPage: fetching post id=", id);
 
     setError(null);
-    fetch(`/api/posts/${id}`)
+    fetch(`${process.env.REACT_APP_API_URL}/api/posts/${id}`)
       .then(async (res) => {
         const text = await res.text();
         return JSON.parse(text);

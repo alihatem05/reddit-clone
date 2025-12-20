@@ -19,7 +19,7 @@ function CreatePost({ onClose, onPostCreated, defaultCommunity = "" }) {
   const [imageError, setImageError] = useState(false);
 
   const fetchCommunities = () => {
-    fetch(`/api/communities`)
+    fetch(`${process.env.REACT_APP_API_URL}/api/communities`)
       .then((res) => res.json())
       .then(setCommunities)
       .catch((err) => console.log("Error fetching communities:", err));
@@ -104,7 +104,7 @@ function CreatePost({ onClose, onPostCreated, defaultCommunity = "" }) {
         postData.image = imageUrl;
       }
 
-      const response = await fetch(`/api/posts`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/posts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(postData),

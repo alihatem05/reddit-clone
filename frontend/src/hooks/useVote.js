@@ -83,8 +83,8 @@ export const useVote = (item, setItem, type = 'post') => {
 
     try {
       const endpoint = type === 'comment' 
-        ? `/api/comments/${item._id}/vote`
-        : `/api/posts/${item._id}/vote`;
+        ? `${process.env.REACT_APP_API_URL}/api/comments/${item._id}/vote`
+        : `${process.env.REACT_APP_API_URL}/api/posts/${item._id}/vote`;
 
       const res = await fetch(endpoint, {
         method: 'PATCH',

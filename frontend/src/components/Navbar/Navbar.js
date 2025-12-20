@@ -18,12 +18,12 @@ function Navbar() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`/api/communities`)
+    fetch(`${process.env.REACT_APP_API_URL}/api/communities`)
       .then((res) => res.json())
       .then(setCommunities)
       .catch((err) => console.log("Error fetching communities:", err));
     
-    fetch(`/api/users`)
+    fetch(`${process.env.REACT_APP_API_URL}/api/users`)
       .then((res) => res.json())
       .then(setUsers)
       .catch((err) => console.log("Error fetching users:", err));

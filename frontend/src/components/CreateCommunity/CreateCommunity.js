@@ -101,7 +101,7 @@ function CreateCommunity({ onClose, onCommunityCreated }) {
         communityData.backgroundImage = backgroundUrl;
       }
 
-      const response = await fetch(`/api/communities`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/communities`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(communityData),

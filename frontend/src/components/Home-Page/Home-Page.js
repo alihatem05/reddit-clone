@@ -10,7 +10,7 @@ function HomePage() {
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
-        fetch(`/api/posts`)
+        fetch(`${process.env.REACT_APP_API_URL}/api/posts`)
         .then((res) => res.json())
         .then(setPosts)
         .catch(console.log);

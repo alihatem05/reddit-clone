@@ -25,7 +25,7 @@ function CommunityPage() {
   useEffect(() => {
     if (!id) return;
     
-    fetch(`/api/communities/${id}`)
+    fetch(`${process.env.REACT_APP_API_URL}/api/communities/${id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.error) {
@@ -53,7 +53,7 @@ function CommunityPage() {
         setIsLoading(false);
       });
 
-    fetch(`/api/communities/${id}/posts`)
+    fetch(`${process.env.REACT_APP_API_URL}/api/communities/${id}/posts`)
       .then((res) => res.json())
       .then((data) => {
         setPosts(data || []);
@@ -124,7 +124,7 @@ function CommunityPage() {
   const handlePostCreated = (newPost) => {
     setShowCreatePost(false);
     setPosts((prevPosts) => [newPost, ...prevPosts]);
-    fetch(`/api/communities/${id}`)
+    fetch(`${process.env.REACT_APP_API_URL}/api/communities/${id}`)
       .then((res) => res.json())
       .then(setCommunity);
   };
@@ -134,7 +134,7 @@ function CommunityPage() {
     
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/communities/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/communities/${id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: currentUser._id }),

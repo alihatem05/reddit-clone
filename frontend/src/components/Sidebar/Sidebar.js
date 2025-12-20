@@ -30,7 +30,7 @@ export default function Sidebar() {
   };
 
   useEffect(() => {
-    fetch(`/api/communities`)
+    fetch(`${process.env.REACT_APP_API_URL}/api/communities`)
       .then((response) => response.json())
       .then((data) => {
         setCommunities(data);
@@ -38,7 +38,7 @@ export default function Sidebar() {
       .catch((err) => console.log("Error fetching communities:", err));
     
     const handleCommunityCreated = () => {
-      fetch(`/api/communities`)
+      fetch(`${process.env.REACT_APP_API_URL}/api/communities`)
         .then((response) => response.json())
         .then((data) => {
           setCommunities(data);
