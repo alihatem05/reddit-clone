@@ -102,7 +102,7 @@
 #yarabD {
     display: flex;
     flex-direction: row;
-    min-width: 200px;
+    min-width: 250px;
 }
 
 #bottomSectionDetailed {
@@ -210,7 +210,7 @@
 }
 
 #trashcan {
-    margin-left: 280px;
+    margin-left: 230px;
     font-size: 18px;
     padding: 3px;
     border: solid #3E4142;

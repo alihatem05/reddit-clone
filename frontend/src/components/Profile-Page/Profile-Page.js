@@ -46,7 +46,7 @@ const ProfilePage = () => {
     if (!user || !user._id) return;
     setIsLoading(true);
     
-    fetch(`/api/users/${user._id}`)
+    fetch(`${process.env.REACT_APP_API_URL}/api/users/${user._id}`)
       .then((res) => res.json())
       .then((data) => {
         setPosts(data.posts || []);

@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 import postRoutes from "./routes/postRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import communityRoutes from "./routes/communityRoutes.js";
@@ -9,10 +11,13 @@ import mongoose from "mongoose";
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: "*",
   credentials: true
 }));
 app.use(express.json());
@@ -22,11 +27,14 @@ app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/communities", communityRoutes);
 
+app.use(express.static(path.join(__dirname, "../../frontend/build")));
+
 app.use((req, res, next) => {
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: "API endpoint not found" });
+  if (!req.path.startsWith('/api/')) {
+    res.sendFile(path.join(__dirname, "../../frontend/build", "index.html"));
+  } else {
+    res.status(404).json({ error: "API endpoint not found" });
   }
-  next();
 });
 
 const PORT = process.env.PORT;
