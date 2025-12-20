@@ -49,14 +49,17 @@ export const voteComment = async (req, res) => {
     const userObjectId = new mongoose.Types.ObjectId(userId);
     const hasUp = comment.upvoters.some(u => u.toString() === userId);
     const hasDown = comment.downvoters.some(u => u.toString() === userId);
+    let karmaChange = 0;
 
     if (delta === 0) {
       if (hasUp) {
         comment.upvoters = comment.upvoters.filter(u => u.toString() !== userId);
         comment.karma -= 1;
+        karmaChange = -1;
       } else if (hasDown) {
         comment.downvoters = comment.downvoters.filter(u => u.toString() !== userId);
         comment.karma += 1;
+        karmaChange = 1;
       } else {
         return res.status(400).json({ error: 'No existing vote to remove' });
       }
@@ -64,10 +67,14 @@ export const voteComment = async (req, res) => {
       if (hasUp) {
         comment.upvoters = comment.upvoters.filter(u => u.toString() !== userId);
         comment.karma -= 1;
+        karmaChange = -1;
       } else {
         if (hasDown) {
           comment.downvoters = comment.downvoters.filter(u => u.toString() !== userId);
           comment.karma += 1;
+          karmaChange = 2;
+        } else {
+          karmaChange = 1;
         }
         comment.upvoters.push(userObjectId);
         comment.karma += 1;
@@ -76,16 +83,24 @@ export const voteComment = async (req, res) => {
       if (hasDown) {
         comment.downvoters = comment.downvoters.filter(u => u.toString() !== userId);
         comment.karma += 1;
+        karmaChange = 1;
       } else {
         if (hasUp) {
           comment.upvoters = comment.upvoters.filter(u => u.toString() !== userId);
           comment.karma -= 1;
+          karmaChange = -2;
+        } else {
+          karmaChange = -1;
         }
         comment.downvoters.push(userObjectId);
         comment.karma -= 1;
       }
     }
     await comment.save();
+    
+    if (karmaChange !== 0 && comment.user) {
+      await User.findByIdAndUpdate(comment.user, { $inc: { karma: karmaChange } });
+    }
     const populated = await Comment.findById(comment._id)
       .populate('user')
       .populate({ path: 'replies', populate: { path: 'user', select: 'username avatar' } });

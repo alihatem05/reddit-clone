@@ -8,6 +8,7 @@ import CreatePost from "../CreatePost/CreatePost";
 
 function Navbar() {
   const [communities, setCommunities] = useState([]);
+  const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -21,14 +22,29 @@ function Navbar() {
       .then((res) => res.json())
       .then(setCommunities)
       .catch((err) => console.log("Error fetching communities:", err));
+    
+    fetch(`/api/users`)
+      .then((res) => res.json())
+      .then(setUsers)
+      .catch((err) => console.log("Error fetching users:", err));
   }, []);
 
   const filteredCommunities = communities.filter((c) =>
     c.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const filteredUsers = users.filter((u) =>
+    u.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const handleCommunityClick = (id) => {
     navigate(`/community/${id}`);
+    setSearchTerm("");
+    setShowDropdown(false);
+  };
+
+  const handleUserClick = (id) => {
+    navigate(`/profile/${id}`);
     setSearchTerm("");
     setShowDropdown(false);
   };
@@ -68,16 +84,43 @@ function Navbar() {
             />
             {showDropdown && searchTerm && (
               <div className="search-dropdown">
-                {filteredCommunities.length === 0 && <p>No communities found</p>}
-                {filteredCommunities.map((c) => (
-                  <div
-                    key={c._id}
-                    className="dropdown-item"
-                    onClick={() => handleCommunityClick(c._id)}
-                  >
-                    r/{c.name}
-                  </div>
-                ))}
+                {filteredCommunities.length === 0 && filteredUsers.length === 0 && (
+                  <p>No results found</p>
+                )}
+                {filteredCommunities.length > 0 && (
+                  <>
+                    <div className="dropdown-section-title">Communities</div>
+                    {filteredCommunities.map((c) => (
+                      <div
+                        key={c._id}
+                        className="dropdown-item"
+                        onClick={() => handleCommunityClick(c._id)}
+                      >
+                        <i className="bi bi-reddit" style={{ marginRight: '8px' }}></i>
+                        r/{c.name}
+                      </div>
+                    ))}
+                  </>
+                )}
+                {filteredUsers.length > 0 && (
+                  <>
+                    <div className="dropdown-section-title">Users</div>
+                    {filteredUsers.map((u) => (
+                      <div
+                        key={u._id}
+                        className="dropdown-item"
+                        onClick={() => handleUserClick(u._id)}
+                      >
+                        <img 
+                          src={u.avatar?.startsWith('data:image/') ? u.avatar : `/pfps/${u.avatar || 'gray.png'}`} 
+                          alt={u.username} 
+                          style={{ width: '20px', height: '20px', borderRadius: '50%', marginRight: '8px' }}
+                        />
+                        u/{u.username}
+                      </div>
+                    ))}
+                  </>
+                )}
               </div>
             )}
           </div>

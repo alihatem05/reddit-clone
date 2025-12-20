@@ -92,11 +92,11 @@
   overflow-y: auto;
   z-index: 1002;
   box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+  color: #a0a0a0;
 }
 
 .search-dropdown p {
   padding: 8px 12px;
-  color: #a0a0a0;
   font-size: 14px;
 }
 

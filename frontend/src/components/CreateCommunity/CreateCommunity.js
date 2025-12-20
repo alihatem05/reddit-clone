@@ -152,14 +152,14 @@ function CreateCommunity({ onClose, onCommunityCreated }) {
           <div className="form-group">
             <label htmlFor="name">Community Name *</label>
             <div className="name-input-wrapper">
-              <span className="name-prefix">r/</span>
+              <span className="name-prefix"></span>
               <input
                 id="name"
                 name="name"
                 type="text"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="communityname"
+                placeholder="Community Name"
                 maxLength={21}
                 required
               />

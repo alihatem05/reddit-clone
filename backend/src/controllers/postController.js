@@ -79,19 +79,20 @@ export const votePost = async (req, res) => {
     const post = await Post.findById(id);
     if (!post) return res.status(404).json({ error: 'Post not found' });
 
-    // Convert userId to ObjectId for consistency
     const userObjectId = new mongoose.Types.ObjectId(userId);
     const hasUp = post.upvoters.some(u => u.toString() === userId);
     const hasDown = post.downvoters.some(u => u.toString() === userId);
+    let karmaChange = 0;
 
     if (delta === 0) {
-      // remove existing vote
       if (hasUp) {
         post.upvoters = post.upvoters.filter(u => u.toString() !== userId);
         post.votes -= 1;
+        karmaChange = -1;
       } else if (hasDown) {
         post.downvoters = post.downvoters.filter(u => u.toString() !== userId);
         post.votes += 1;
+        karmaChange = 1;
       } else {
         return res.status(400).json({ error: 'No existing vote to remove' });
       }
@@ -99,10 +100,14 @@ export const votePost = async (req, res) => {
       if (hasUp) {
         post.upvoters = post.upvoters.filter(u => u.toString() !== userId);
         post.votes -= 1;
+        karmaChange = -1;
       } else {
         if (hasDown) {
           post.downvoters = post.downvoters.filter(u => u.toString() !== userId);
-          post.votes += 1; // remove downvote then add upvote
+          post.votes += 1;
+          karmaChange = 2;
+        } else {
+          karmaChange = 1;
         }
         post.upvoters.push(userObjectId);
         post.votes += 1;
@@ -111,16 +116,25 @@ export const votePost = async (req, res) => {
       if (hasDown) {
         post.downvoters = post.downvoters.filter(u => u.toString() !== userId);
         post.votes += 1;
+        karmaChange = 1;
       } else {
         if (hasUp) {
           post.upvoters = post.upvoters.filter(u => u.toString() !== userId);
-          post.votes -= 1; // remove upvote (-1) then add downvote (-1)
+          post.votes -= 1;
+          karmaChange = -2;
+        } else {
+          karmaChange = -1;
         }
         post.downvoters.push(userObjectId);
         post.votes -= 1;
       }
     }
     await post.save();
+    
+    if (karmaChange !== 0 && post.user) {
+      await User.findByIdAndUpdate(post.user, { $inc: { karma: karmaChange } });
+    }
+    
     const populated = await Post.findById(post._id)
       .populate('user')
       .populate('community')
