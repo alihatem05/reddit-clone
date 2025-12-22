@@ -264,6 +264,20 @@
     background-color: #323232;
 }
 
+#ai-button {
+    background-color: #0f1314;
+    color: white;
+    width: 130px;
+    height: 32px;
+    border: solid #3E4142;
+    border-radius: 30px;
+}
+
+#ai-button:hover {
+    cursor: pointer;
+    background-color: #323232;
+}
+
 .arrow.active {
     color: #f97316;
 }

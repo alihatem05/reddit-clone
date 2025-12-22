@@ -33,6 +33,8 @@ function PostPage({ }) {
   const { user: currentUser } = useAuthContext();
   const [commentText, setCommentText] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [summary, setSummary] = useState("");
+  const [isLoadingSummary, setIsLoadingSummary] = useState(false);
   
   const appendReplyToComment = (commentsArray, parentId, newComment) => {
     return commentsArray.map(c => {
@@ -185,6 +187,33 @@ function PostPage({ }) {
     }
   };
 
+  const summarizePost = async () => {
+    try {
+      setIsLoadingSummary(true);
+      setSummary(''); // Clear previous summary
+      const postContent = `${post.title}\n\n${post.description || ''}`;
+      console.log('Sending summarize request with content:', postContent);
+      
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/summarize`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: postContent })
+      });
+
+      console.log('Response status:', res.status);
+      const data = await res.json();
+      console.log('Response data:', data);
+      
+      setSummary(data.summary);
+    } catch (err) {
+      console.error('Failed to summarize:', err);
+      setSummary('Failed to generate summary. Please try again.');
+    } finally {
+      setIsLoadingSummary(false);
+    }
+  };
+
+
   if (!post) return <p style={{ marginTop: "1000px", color: "white" }}>Loading...</p>;
 
   const user = (typeof post.user === "object" ? post.user : null);
@@ -243,7 +272,21 @@ function PostPage({ }) {
               <i id="commentsD" className="bi bi-chat"></i>
               <p>{post.comments.length}</p>
             </div>
+            <div>
+                <button id="ai-button" onClick={() => summarizePost()} disabled={isLoadingSummary}>
+                  {isLoadingSummary ? 'Summarizing...' : 'Summarize with AI'}
+                </button>
+            </div>
           </div>
+
+          {summary && (
+            <div id="ai-summary" style={{ marginTop: '15px', padding: '12px', backgroundColor: '#2a2b2c', borderRadius: '8px', border: '1px solid #3E4142' }}>
+              <p style={{ margin: 0, color: '#d7dadc', fontSize: '14px', lineHeight: '1.5' }}>
+                <strong style={{ color: '#f97316' }}>AI Summary: </strong>
+                {summary}
+              </p>
+            </div>
+          )}
 
       <div style={{height: "1px", width: "100%", backgroundColor: "#3E4142", marginTop: "15px", marginBottom: "15px"}}></div>
 

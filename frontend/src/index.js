@@ -6,6 +6,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import ScrollBar from "./components/scrollbar"
 import { AuthContextProvider } from './AuthContext'
 
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
